@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 const Graph = () => {
     // Single duration for each segment
-    const animDuration = 0.75;
+    const animDuration = 0.40;
 
     // Circle #1: center (150,300), radius = 40
     // Circle #2: center (250,150), radius = 40
