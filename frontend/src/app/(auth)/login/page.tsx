@@ -22,10 +22,12 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 
 import formSchema from "./components/formSchema";
-
+import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import Link from "next/link";
+import { AnimatedGridPattern } from "@/components/ui/animated-grid-pattern";
 export default function Signup() {
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -43,7 +45,7 @@ export default function Signup() {
     }
 
     return (
-        <div className="w-full h-screen flex flex-row-reverse">
+        <div className="w-full h-screen flex flex-row">
             {/* Left Side */}
             <div className="w-3/5 h-full flex flex-col items-center justify-center bg-blue-500">
                 <Card className="w-fit max-h-fit p-6">
@@ -84,8 +86,8 @@ export default function Signup() {
                                     <Button type="submit">
                                         Log in
                                     </Button>
-                                    <Button variant="link">
-                                        Don't Have an Account?
+                                    <Button asChild variant="link">
+                                        <Link href="/signup">Don't Have an Account?</Link>
                                     </Button>
                                 </div>
 

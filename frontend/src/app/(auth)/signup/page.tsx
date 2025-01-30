@@ -27,6 +27,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { ArrowUpLeftFromSquareIcon, ArrowUpRight, SquareArrowUpIcon } from "lucide-react";
+import Link from "next/link";
 export default function Signup() {
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -99,8 +100,8 @@ export default function Signup() {
                                     <Button type="submit">
                                         Register
                                     </Button>
-                                    <Button variant="link">
-                                        Already have an account?
+                                    <Button asChild variant="link">
+                                        <Link href="/login">Already have an account?</Link>
                                     </Button>
                                 </div>
                                 
