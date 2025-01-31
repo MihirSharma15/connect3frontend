@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 const Graph = () => {
     // Single duration for each segment
     const animDuration = 0.40;
-
+    const colorOfGraph = "black";
     // Circle #1: center (150,300), radius = 40
     // Circle #2: center (250,150), radius = 40
     // Circle #3: center (100,  0), radius = 40
@@ -39,7 +39,7 @@ const Graph = () => {
                 cy="300"
                 r="40"
                 fill="white"
-                stroke="black"
+                stroke={colorOfGraph}
                 strokeWidth="5"
                 initial={{ pathLength: 0 }}
                 animate={{ pathLength: 1 }}
@@ -56,11 +56,11 @@ const Graph = () => {
                 y1={line1Start.y}
                 x2={line1End.x}
                 y2={line1End.y}
-                stroke="black"
+                stroke={colorOfGraph}
                 strokeWidth="5"
                 fill="none"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
+                initial={{ pathLength: 0, scale: 0 }}
+                animate={{ pathLength: 1, scale: 1 }}
                 transition={{
                     duration: animDuration,
                     ease: 'easeInOut',
@@ -74,7 +74,7 @@ const Graph = () => {
                 cy="150"
                 r="40"
                 fill="white"
-                stroke="black"
+                stroke={colorOfGraph}
                 strokeWidth="5"
                 initial={{ pathLength: 0 }}
                 animate={{ pathLength: 1 }}
@@ -91,11 +91,11 @@ const Graph = () => {
                 y1={line2Start.y}
                 x2={line2End.x}
                 y2={line2End.y}
-                stroke="black"
+                stroke={colorOfGraph}
                 strokeWidth="5"
                 fill="none"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
+                initial={{ pathLength: 0, scale: 0 }}
+                animate={{ pathLength: 1, scale: 1 }}
                 transition={{
                     duration: animDuration,
                     ease: 'easeInOut',
@@ -109,10 +109,10 @@ const Graph = () => {
                 cy="0"
                 r="40"
                 fill="white"
-                stroke="black"
+                stroke={colorOfGraph}
                 strokeWidth="5"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
+                initial={{ pathLength: 0, }}
+                animate={{ pathLength: 1, }}
                 transition={{
                     duration: animDuration,
                     ease: 'easeInOut',
