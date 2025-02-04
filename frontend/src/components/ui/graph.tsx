@@ -102,7 +102,6 @@ const Graph = () => {
                     delay: animDuration * 3
                 }}
             />
-
             {/* 5) Circle #3 (draw after Line 2 finishes => delay: 8) */}
             <motion.circle
                 cx="100"
