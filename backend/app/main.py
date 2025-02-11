@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordBearer
 from typing import Annotated
 from neo4j import GraphDatabase
 from twilio.rest import Client
-
+from fastapi.middleware.cors import CORSMiddleware
 
 # internal 
 from backend.app.services.auth import create_access_token, get_current_user
@@ -35,6 +35,14 @@ app = FastAPI(lifespan=lifespan,
               title="Connect3",
               description="A social network",
               version="0.1.0",)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Adjust this in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(user_router)
 app.include_router(auth_router)
