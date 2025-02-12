@@ -1,17 +1,17 @@
 # external
-from fastapi import FastAPI, APIRouter, Depends
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import FastAPI, Depends
 from typing import Annotated
 from neo4j import GraphDatabase
 from twilio.rest import Client
 from fastapi.middleware.cors import CORSMiddleware
 
 # internal 
-from backend.app.services.auth import create_access_token, get_current_user
-from backend.app.core.config import settings
-from backend.app.routes.users import user_router
-from backend.app.routes.auth import auth_router
-from backend.app.schemas.users import UserInDb
+from .services.auth import get_current_user
+from .core.config import settings
+from .routes.auth import auth_router
+from .routes.users import user_router
+from .schemas.users import UserInDb
+from .services.neo4j_db import get_neo4j_driver
 
 async def lifespan(app: FastAPI):
     """Controls the lifespan of the app from startup to shutdown and properly manages the neccessary resources"""
@@ -51,4 +51,15 @@ app.include_router(auth_router)
 async def root(current_user: Annotated[UserInDb, Depends(get_current_user)]):
     return {"message": "Welcome to Connect3"}
 
+@app.get("/health")
+async def health(db: Annotated[GraphDatabase, Depends(get_neo4j_driver)]):
+    try:
+        db.verify_connectivity()
+        db_status = "ok"
+    except Exception as e:
+        db_status = "error"
 
+    return {
+        "fastapi": "ok",
+        "neo4j_db": db_status
+        }

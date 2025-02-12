@@ -1,11 +1,9 @@
 from datetime import datetime
 from typing import Literal, Optional
-from pydantic_extra_types.phone_numbers import PhoneNumber
 from pydantic import BaseModel
 
-from backend.app.schemas.auth import Token
-from backend.app.schemas.users import UserPhonenumber
-from backend.app.schemas.usphonenumber import USPhoneNumber
+from ..schemas.auth import Token
+from ..schemas.usphonenumber import USPhoneNumber
 
 class TwilioVerificationModel(BaseModel):
     """

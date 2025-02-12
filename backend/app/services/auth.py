@@ -1,20 +1,18 @@
 from fastapi import HTTPException, status
 from typing import Annotated
 from fastapi import Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 from neo4j import Session
 from datetime import timedelta, datetime
-from typing import Optional
 import jwt
 from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
 
 # internal
-from backend.app.core.config import Settings, settings
-from backend.app.services.neo4j_db import create_user_in_db, get_neo4j_session, get_user_in_db 
-from backend.app.core.config import settings
-from backend.app.schemas.users import BaseUser, SignUpUser, UserPhonenumber
-from backend.app.schemas.auth import Token, TokenData
+from ..core.config import settings
+from ..services.neo4j_db import create_user_in_db, get_neo4j_session, get_user_in_db
+from ..schemas.users import BaseUser, SignUpUser, UserPhonenumber
+from ..schemas.auth import Token, TokenData
 
 SECRET_KEY = settings.JWT_SECRET_KEY
 ALGORITHM = "HS256"

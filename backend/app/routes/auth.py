@@ -1,24 +1,19 @@
-
 # External
 
 from datetime import timedelta
-from multiprocessing import Value
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Header, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-import jwt
 from neo4j import Session
-from pydantic import BaseModel
 
 
 # internal
-from backend.app.services.auth import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY, authenticate_user, create_access_token, signup_user_service, verify_phone_verification_token
-from backend.app.schemas.users import BaseUser, LogInUser, SignUpUser, SignUpUserWithToken, UserInDb, UserPhonenumber
-from backend.app.services.neo4j_db import get_neo4j_session
-from backend.app.schemas.auth import Token, TokenData
-from backend.app.schemas.twilio import TwilioVerificationModel, VerifyOTPModel
-from backend.app.services.twilio import get_twilio_service, send_OTP_text, verify_OTP_text
-from backend.app.core.config import settings
+from ..services.auth import ACCESS_TOKEN_EXPIRE_MINUTES, authenticate_user, create_access_token, signup_user_service, verify_phone_verification_token
+from ..schemas.users import SignUpUser, UserInDb, UserPhonenumber
+from ..services.neo4j_db import get_neo4j_session
+from ..schemas.auth import Token
+from ..schemas.twilio import TwilioVerificationModel, VerifyOTPModel
+from ..services.twilio import get_twilio_service, send_OTP_text, verify_OTP_text
 
 auth_router = APIRouter(
     tags=["auth"],
@@ -28,6 +23,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 @auth_router.post("/send-code", response_model=TwilioVerificationModel, status_code=status.HTTP_201_CREATED)
 async def send_otp_code_route(phonenumber: UserPhonenumber, twilio_service = Depends(get_twilio_service)):
+    """This route sends an OTP code to the given phone number"""
     try:
         return send_OTP_text(phonenumber=phonenumber, service=twilio_service)
     except Exception as e:

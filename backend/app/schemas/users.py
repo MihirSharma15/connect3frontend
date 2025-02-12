@@ -1,13 +1,10 @@
-import datetime
-from unittest.mock import Base
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field
 from pydantic_extra_types.phone_numbers import PhoneNumber
-from datetime import date
 from typing import List
 
 # internal
-from backend.app.schemas.auth import Token
-from backend.app.schemas.usphonenumber import USPhoneNumber
+from ..schemas.auth import Token
+from ..schemas.usphonenumber import USPhoneNumber
 
 # PhoneNumber Type SETS THE DEFAULT TYPE TO BE OF US and the formating!!
 PhoneNumber.default_region_code = "US"

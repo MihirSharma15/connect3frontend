@@ -1,13 +1,13 @@
 """This file manages all the Twilio Services"""
 
 # external
-from fastapi import Depends, Request
+from fastapi import Request
 from twilio.rest import Client
 from functools import lru_cache
 # internal
-from backend.app.core.config import settings
-from backend.app.schemas.twilio import TwilioVerificationModel, VerifyOTPModel
-from backend.app.schemas.users import UserPhonenumber
+from ..core.config import settings
+from ..schemas.twilio import TwilioVerificationModel, VerifyOTPModel
+from ..schemas.users import UserPhonenumber
 
 @lru_cache
 def get_twilio_client(request: Request) -> Client:

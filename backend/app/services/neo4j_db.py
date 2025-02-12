@@ -4,17 +4,14 @@ THIS PAGE DOCUMENTS THE NEO4J DATABASE CONNECTION
 General rule of thumb, all raw cypher queries get put in here
 
 """
-
 # external 
 import datetime
-from neo4j import GraphDatabase
-from fastapi import HTTPException, Request, Depends
-from neo4j import Session 
-from typing import Optional, Union
+from fastapi import HTTPException, Request
+from neo4j import Session
+from typing import Optional
 from functools import lru_cache
 # internal 
-from backend.app.core.config import settings 
-from backend.app.schemas.users import BaseUser, MinimalUser, UserConnections, UserInDb, UserPhonenumber
+from ..schemas.users import BaseUser, MinimalUser, UserConnections, UserInDb, UserPhonenumber
 
 # HELPER METHODS
 @lru_cache
@@ -137,7 +134,7 @@ async def check_connection(user1: UserPhonenumber, user2: UserPhonenumber, sessi
         # If there's no record, consider them not connected
         return False
     except ValueError as e:
-        raise ValueError
+        raise ValueError(e) from e
 
 async def create_connection(user1: UserPhonenumber, user2: UserPhonenumber, session: Session):
     """
@@ -248,4 +245,3 @@ async def find_shortest_path(user1: UserPhonenumber, user2: UserPhonenumber, ses
         # Handle the case when no path is found
         raise ValueError("No connection path found between the two users.")
 
-    

@@ -1,13 +1,12 @@
-
 # external 
 from typing import Annotated
-from fastapi import FastAPI, APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from neo4j import Session
 
 # internal
-from backend.app.services.neo4j_db import check_connection, create_connection, find_shortest_path, get_neo4j_session, create_user_in_db, get_num_of_connections, get_user_in_db, reduce_connection_count
-from backend.app.schemas.users import BaseUser, UserConnections, UserInDb, UserPhonenumber
-from backend.app.services.auth import get_current_user
+from ..services.neo4j_db import check_connection, create_connection, find_shortest_path, get_neo4j_session, create_user_in_db, get_num_of_connections, get_user_in_db, reduce_connection_count
+from ..schemas.users import BaseUser, UserConnections, UserInDb, UserPhonenumber
+from ..services.auth import get_current_user
 
 user_router = APIRouter(
     prefix="/users",
