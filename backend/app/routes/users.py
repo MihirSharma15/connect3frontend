@@ -4,9 +4,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from neo4j import Session
 
 # internal
-from ..services.neo4j_db import check_connection, create_connection, find_shortest_path, get_neo4j_session, create_user_in_db, get_num_of_connections, get_user_in_db, reduce_connection_count
-from ..schemas.users import BaseUser, UserConnections, UserInDb, UserPhonenumber
-from ..services.auth import get_current_user
+from app.services.neo4j_db import check_connection, create_connection, find_shortest_path, get_neo4j_session, create_user_in_db, get_num_of_connections, get_user_in_db, reduce_connection_count
+from app.schemas.users import BaseUser, UserConnections, UserInDb, UserPhonenumber
+from app.services.auth import get_current_user
 
 user_router = APIRouter(
     prefix="/users",

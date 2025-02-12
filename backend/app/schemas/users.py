@@ -3,8 +3,8 @@ from pydantic_extra_types.phone_numbers import PhoneNumber
 from typing import List
 
 # internal
-from ..schemas.auth import Token
-from ..schemas.usphonenumber import USPhoneNumber
+from app.schemas.auth import Token
+from app.schemas.usphonenumber import USPhoneNumber
 
 # PhoneNumber Type SETS THE DEFAULT TYPE TO BE OF US and the formating!!
 PhoneNumber.default_region_code = "US"

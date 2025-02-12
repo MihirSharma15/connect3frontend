@@ -11,7 +11,7 @@ from neo4j import Session
 from typing import Optional
 from functools import lru_cache
 # internal 
-from ..schemas.users import BaseUser, MinimalUser, UserConnections, UserInDb, UserPhonenumber
+from app.schemas.users import BaseUser, MinimalUser, UserConnections, UserInDb, UserPhonenumber
 
 # HELPER METHODS
 @lru_cache

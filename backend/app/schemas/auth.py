@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from ..schemas.usphonenumber import USPhoneNumber
+from app.schemas.usphonenumber import USPhoneNumber
 
 class Token(BaseModel):
     access_token: str

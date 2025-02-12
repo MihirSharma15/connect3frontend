@@ -7,12 +7,12 @@ from twilio.rest import Client
 from fastapi.middleware.cors import CORSMiddleware
 
 # internal 
-from .services.auth import get_current_user
-from .core.config import settings
-from .routes.auth import auth_router
-from .routes.users import user_router
-from .schemas.users import UserInDb
-from .services.neo4j_db import get_neo4j_driver
+from app.services.auth import get_current_user
+from app.core.config import settings
+from app.routes.auth import auth_router
+from app.routes.users import user_router
+from app.schemas.users import UserInDb
+from app.services.neo4j_db import get_neo4j_driver
 
 async def lifespan(app: FastAPI):
     """Controls the lifespan of the app from startup to shutdown and properly manages the neccessary resources"""

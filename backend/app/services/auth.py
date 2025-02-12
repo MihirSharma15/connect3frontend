@@ -9,10 +9,10 @@ from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
 
 # internal
-from ..core.config import settings
-from ..services.neo4j_db import create_user_in_db, get_neo4j_session, get_user_in_db
-from ..schemas.users import BaseUser, SignUpUser, UserPhonenumber
-from ..schemas.auth import Token, TokenData
+from app.core.config import settings
+from app.services.neo4j_db import create_user_in_db, get_neo4j_session, get_user_in_db
+from app.schemas.users import BaseUser, SignUpUser, UserPhonenumber
+from app.schemas.auth import Token, TokenData
 
 SECRET_KEY = settings.JWT_SECRET_KEY
 ALGORITHM = "HS256"

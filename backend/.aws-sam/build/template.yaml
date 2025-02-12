@@ -11,8 +11,8 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: FastAPIFunction
-      Handler: main.handler
-      Runtime: python3.11
+      Handler: app.main.handler
+      Runtime: python3.13
       Events:
         Api:
           Type: Api

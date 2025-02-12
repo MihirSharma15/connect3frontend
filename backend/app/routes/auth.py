@@ -8,12 +8,12 @@ from neo4j import Session
 
 
 # internal
-from ..services.auth import ACCESS_TOKEN_EXPIRE_MINUTES, authenticate_user, create_access_token, signup_user_service, verify_phone_verification_token
-from ..schemas.users import SignUpUser, UserInDb, UserPhonenumber
-from ..services.neo4j_db import get_neo4j_session
-from ..schemas.auth import Token
-from ..schemas.twilio import TwilioVerificationModel, VerifyOTPModel
-from ..services.twilio import get_twilio_service, send_OTP_text, verify_OTP_text
+from app.services.auth import ACCESS_TOKEN_EXPIRE_MINUTES, authenticate_user, create_access_token, signup_user_service, verify_phone_verification_token
+from app.schemas.users import SignUpUser, UserInDb, UserPhonenumber
+from app.services.neo4j_db import get_neo4j_session
+from app.schemas.auth import Token
+from app.schemas.twilio import TwilioVerificationModel, VerifyOTPModel
+from app.services.twilio import get_twilio_service, send_OTP_text, verify_OTP_text
 
 auth_router = APIRouter(
     tags=["auth"],

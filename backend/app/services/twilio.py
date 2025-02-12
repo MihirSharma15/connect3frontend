@@ -5,9 +5,9 @@ from fastapi import Request
 from twilio.rest import Client
 from functools import lru_cache
 # internal
-from ..core.config import settings
-from ..schemas.twilio import TwilioVerificationModel, VerifyOTPModel
-from ..schemas.users import UserPhonenumber
+from app.core.config import settings
+from app.schemas.twilio import TwilioVerificationModel, VerifyOTPModel
+from app.schemas.users import UserPhonenumber
 
 @lru_cache
 def get_twilio_client(request: Request) -> Client:
