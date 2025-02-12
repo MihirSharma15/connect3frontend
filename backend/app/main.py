@@ -1,6 +1,7 @@
 # external
 from fastapi import FastAPI, Depends
 from typing import Annotated
+from mangum import Mangum
 from neo4j import GraphDatabase
 from twilio.rest import Client
 from fastapi.middleware.cors import CORSMiddleware
@@ -63,3 +64,5 @@ async def health(db: Annotated[GraphDatabase, Depends(get_neo4j_driver)]):
         "fastapi": "ok",
         "neo4j_db": db_status
         }
+
+handler = Mangum(app)

@@ -1,0 +1,23 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'Connect3 Application deployed on AWS Lambda
+
+  '
+Globals:
+  Function:
+    Timeout: 30
+Resources:
+  FastAPIFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: FastAPIFunction
+      Handler: main.handler
+      Runtime: python3.11
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+    Metadata:
+      SamResourceId: FastAPIFunction
