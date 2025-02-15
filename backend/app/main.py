@@ -1,7 +1,6 @@
 # external
 from fastapi import FastAPI, Depends
 from typing import Annotated
-from mangum import Mangum
 from neo4j import GraphDatabase
 from twilio.rest import Client
 from fastapi.middleware.cors import CORSMiddleware
@@ -49,7 +48,7 @@ app.include_router(user_router)
 app.include_router(auth_router)
 
 @app.get("/")
-async def root(current_user: Annotated[UserInDb, Depends(get_current_user)]):
+async def root():
     return {"message": "Welcome to Connect3"}
 
 @app.get("/health")
@@ -65,4 +64,3 @@ async def health(db: Annotated[GraphDatabase, Depends(get_neo4j_driver)]):
         "neo4j_db": db_status
         }
 
-handler = Mangum(app)
