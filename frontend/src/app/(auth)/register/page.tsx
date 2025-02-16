@@ -1,10 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useFieldArray } from "react-hook-form";
 import {
   Card,
   CardContent,
@@ -22,14 +22,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-
+// Validation schema
 const formSchema = z.object({
   friends: z
     .array(
-      z
-        .string()
-        .regex(/^\+?[1-9]\d{1,14}$/, "Invalid phone number format")
-        .optional()
+      z.string().regex(/^\+?[1-9]\d{1,14}$/, "Invalid phone number format")
     )
     .min(1, "Please add at least 1 friend.")
     .max(3, "You can add up to 3 friends."),
@@ -38,34 +35,23 @@ const formSchema = z.object({
 export default function RegisterFriends() {
   const router = useRouter();
 
-  // React state to manage the number of friend fields, defaulting to 3
-  const [friendsCount, setFriendsCount] = useState(3);
-
-  // Initialize the form and validation logic
+  // Initialize the form with default values
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      friends: Array(friendsCount).fill(""), // Default: 3 empty friend inputs
+      friends: [" ", " ", " "], 
     },
   });
 
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "friends",
+  });
+
+  // Handle form submission
   function onSubmit(data: z.infer<typeof formSchema>) {
-    console.log("Registered Friends:", data);
-    router.push("/dashboard");
-  }
-
-  // Add a new friend field (up to 3)
-  function addFriendField() {
-    if (friendsCount < 3) {
-      setFriendsCount(friendsCount + 1);
-    }
-  }
-
-  // Remove a friend field (at least 1 required)
-  function removeFriendField() {
-    if (friendsCount > 1) {
-      setFriendsCount(friendsCount - 1);
-    }
+    console.log("Registered Friends:", data); // Log submitted data
+    router.push("/dashboard"); // Navigate to dashboard after submission
   }
 
   return (
@@ -77,19 +63,17 @@ export default function RegisterFriends() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              {Array.from({ length: friendsCount }).map((_, index) => (
+              {/* Dynamically render fields */}
+              {fields.map((field, index) => (
                 <FormField
-                  key={index}
+                  key={field.id}
                   control={form.control}
-                  name={`friends.${index}`} // Dynamic field name
+                  name={`friends.${index}`}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Friend {index + 1}</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="xxx-xxx-xxxx"
-                          {...field}
-                        />
+                        <Input placeholder="+1234567890" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -97,27 +81,27 @@ export default function RegisterFriends() {
                 />
               ))}
 
-              {/* Add/Remove Friend Buttons */}
+              {/* Add and Remove friend buttons */}
               <div className="flex justify-between">
                 <Button
                   type="button"
                   variant="secondary"
-                  onClick={addFriendField}
-                  disabled={friendsCount >= 3} // Disable if 3 fields
+                  onClick={() => append(" ")} // Append a blank field
+                  disabled={fields.length >= 3} // Limit to 3 fields
                 >
                   Add Friend
                 </Button>
                 <Button
                   type="button"
                   variant="destructive"
-                  onClick={removeFriendField}
-                  disabled={friendsCount <= 1} // Disable if 1 field
+                  onClick={() => remove(fields.length - 1)} // Remove the last field
+                  disabled={fields.length <= 1} // Prevent removing the last field
                 >
                   Remove Friend
                 </Button>
               </div>
 
-              {/* Submit Button */}
+              {/* Submit button */}
               <Button type="submit" className="w-full">
                 Continue
               </Button>
