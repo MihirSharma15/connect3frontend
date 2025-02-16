@@ -4,6 +4,11 @@ from typing import Annotated
 from neo4j import GraphDatabase
 from twilio.rest import Client
 from fastapi.middleware.cors import CORSMiddleware
+<<<<<<< HEAD
+=======
+from backend.app.routes import auth 
+
+>>>>>>> 57c98e69 (Worked on frontend to create user)
 
 # internal 
 from app.services.auth import get_current_user
@@ -36,16 +41,17 @@ app = FastAPI(lifespan=lifespan,
               description="A social network",
               version="0.1.0",)
 
+# Configure CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust this in production
+    allow_origins=["http://localhost:3000"], 
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"], 
+    allow_headers=["*"],  
 )
 
 app.include_router(user_router)
-app.include_router(auth_router)
+app.include_router(auth.auth_router, prefix="/auth")
 
 @app.get("/")
 async def root():
