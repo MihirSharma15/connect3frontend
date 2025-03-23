@@ -8,7 +8,7 @@ import Graph from "@/components/ui/graph";
 import Link from "next/link";
 import { AnimatedGridPattern } from "@/components/ui/animated-grid-pattern";
 import { cn } from "@/lib/utils";
-
+localStorage.theme = 'light';
 export default function Home() {
   return (
     <div className="w-full min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 relative overflow-hidden">
@@ -38,7 +38,7 @@ export default function Home() {
             Connections shape us. See yours.
           </h2>
           <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
-            <Button asChild className="bg-blue-500 text-white px-5 py-3 rounded-lg w-full sm:w-auto">
+            <Button asChild className="">
               <Link href="/signup">
                 Get Started
                 <ArrowUpRightIcon className="ml-2" />
@@ -46,8 +46,7 @@ export default function Home() {
             </Button>
             <Button
               asChild
-              variant="outline"
-              className="bg-white border border-blue-500 text-blue-500 px-5 py-3 rounded-lg w-full sm:w-auto"
+              className=""
             >
               <Link href="/login">Log in</Link>
             </Button>
