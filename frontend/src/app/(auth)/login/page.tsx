@@ -9,6 +9,9 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { toast } from "@/components/hooks/use-toast";
+import React, { useState } from "react";
 import {
   Form,
   FormControl,
@@ -21,19 +24,49 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
-import formSchema from "./components/formSchema";
+import {
+  loginUser
+} from "@/apis/auth";
+import { useMutation } from "@tanstack/react-query";
+
+const formSchema = z.object({
+  phonenumber: z
+    .string()
+    .regex(/^\+?[1-9]\d{1,14}$/, { message: "Invalid phone number format." })   
+    .length(10, { message: "Phone number must be 10 digits" }), 
+  password: z
+    .string()
+    .min(6, { message: "Password must be at least 6 characters" })
+    .regex(/\d/, { message: "Password must contain at least one number" })
+    .regex(/[^A-Za-z0-9]/, {
+      message: "Password must contain at least one special character",
+    }),
+});
 
 export default function Login() {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      phoneNumber: "",
-      password: "",
-    },
+  const router = useRouter();
+  const [accessToken, setAccessToken] = useState("");
+  
+  const loginUserMutation = useMutation({
+      mutationFn: loginUser,
+      onSuccess: (result) => {
+        toast({ title: "User Verified" });
+        setAccessToken(result.access_token);
+        router.push("/dashboard");
+      },
+      onError: (error: any) => {
+        toast({ title: "Error", description: error.message });
+      },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values); // Handle form submission
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: { phonenumber: "", password: "" },
+  });
+
+  const onSubmit = (data: { phonenumber: string; password: string }) => {
+    data.phonenumber = "+1" + data.phonenumber
+    loginUserMutation.mutate(data);
   }
 
   return (
@@ -50,7 +83,7 @@ export default function Login() {
               {/* Phone Number Field */}
               <FormField
                 control={form.control}
-                name="phoneNumber"
+                name="phonenumber"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Phone Number</FormLabel>

@@ -32,6 +32,7 @@ export async function verifyCode(data: { phonenumber: string; code: string }) {
   return result;
 }
 
+// apis/auth.ts
 export async function registerUser(
   data: { name: string; password: string; phonenumber: string },
   token: string
@@ -44,28 +45,103 @@ export async function registerUser(
     },
     body: JSON.stringify(data),
   });
+
   if (!response.ok) {
-    throw new Error("Failed to create account. Please try again.");
+    // Log response status and body for debugging
+    const errorBody = await response.text();
+    console.error("Register user failed. Status:", response.status);
+    console.error("Response body:", errorBody);
+
+    let errorMessage = "Failed to create account. Please try again.";
+    if (errorBody.includes("validation")) {
+      errorMessage = "Validation error: Failed to create account.";
+    } else if (errorBody.includes("phone number")) {
+      errorMessage = "Phone number issue: Failed to create account.";
+    }
+
+    throw new Error(errorMessage);
   }
+
   return response.json();
 }
 
+export async function loginUser(data: { phonenumber: string; password: string }) {
+  const formData = new URLSearchParams({
+    username: data.phonenumber,
+    password: data.password,
+  });
+
+  const response = await fetch(`${API_BASE_URL}/auth/token`, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: formData.toString(),
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.json();
+    console.error("Error response body:", errorBody);
+
+    // Handle errorBody as an array of error details
+    let errorMessage;
+    if (errorBody.detail && Array.isArray(errorBody.detail)) {
+      // If detail is an array of error objects, construct a meaningful error message
+      errorMessage = errorBody.detail.map((error: any) => error.msg).join(" | ");
+    } else if (errorBody.detail) {
+      // If detail is a single error message, use it
+      errorMessage = errorBody.detail;
+    } else if (errorBody.message) {
+      errorMessage = errorBody.message;
+    } else {
+      errorMessage = "Login failed. Unknown error.";
+      console.warn("Unknown error structure:", errorBody);
+    }
+
+    throw new Error(errorMessage);
+  }
+
+  return await response.json();
+}
+
+
 export async function connectWithFriend(receiverPhoneNumber: string, token: string) {
-  const response = await fetch(`${API_BASE_URL}/users/connect`, {
+  const url = new URL(`${API_BASE_URL}/users/connect`);
+  url.searchParams.append('receiver_number', receiverPhoneNumber); // Query parameter instead 
+
+  const response = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ phonenumber: receiverPhoneNumber }),
   });
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.detail || "Failed to connect with the friend.");
-  }
-  return response.json();
-}
 
+  const responseText = await response.text();
+
+  try {
+    const errorBody = JSON.parse(responseText);
+
+    if (!response.ok) {
+      if (errorBody.detail.includes("Not Found")) {
+        throw new Error("User not found.");
+      } else if (errorBody.detail.includes("already connected")) {
+        throw new Error("Users are already connected.");
+      } else {
+        throw new Error(errorBody.detail || "Unexpected connection error.");
+      }
+    }
+
+    console.log("API Response:", responseText);
+    return JSON.parse(responseText);
+  } catch (error) {
+    if (typeof responseText === "string") {
+      console.error("Failed to parse JSON. Raw response:", responseText);
+      throw new Error(`Unexpected API response: ${responseText}`);
+    } else {
+      console.error("Failed to parse JSON.");
+      throw error;
+    }
+  }
+}
 
 export async function searchUserByName(name: string): Promise<UserInDb[]> {
   const response = await fetch(`${API_BASE_URL}/api/${name}`, {

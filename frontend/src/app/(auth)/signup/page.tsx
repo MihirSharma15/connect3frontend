@@ -72,8 +72,6 @@ export default function Signup() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [phonenumber, setPhoneNumber] = useState("");
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
   const [accessToken, setAccessToken] = useState("");
 
   const sendOTPMutation = useMutation({
@@ -104,7 +102,6 @@ export default function Signup() {
       registerUser(data, accessToken),
     onSuccess: () => {
       toast({ title: "Account Created", description: "Welcome to CONNECT3!" });
-      router.push("/dashboard");
     },
     onError: (error: any) => {
       toast({ title: "Error", description: error.message });
@@ -118,7 +115,9 @@ export default function Signup() {
 
   const handlePhoneSubmit = ({ phonenumber }: { phonenumber: string }) => {
     setPhoneNumber(phonenumber);
-    sendOTPMutation.mutate(phonenumber);
+    setAccessToken("[REDACTED_JWT]"); // TESTING DELETE LATER
+    setStep(3); // TESTING DELETE LATER
+    // sendOTPMutation.mutate(phonenumber); UNCOMMENT LATER
   };
 
   const otpForm = useForm({
@@ -136,14 +135,13 @@ export default function Signup() {
   });
 
   const handleDetailsSubmit = (data: { name: string; password: string }) => {
-    setName(data.name);
-    setPassword(data.password);
+    registerUserMutation.mutate({ name: data.name, password: data.password, phonenumber });
     setStep(4);
   };
 
   const friendForm = useForm({
     resolver: zodResolver(friendFormSchema),
-    defaultValues: { friends: ["", "", ""] },
+    defaultValues: { friends: [" ", " ", " "] },
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -186,7 +184,7 @@ export default function Signup() {
           title: "Connections Successful",
           description: "All friends are connected!",
         });
-        registerUserMutation.mutate({ name, password, phonenumber });
+        router.push("/dashboard");
       } else {
         toast({
           title: "Partial Success",
