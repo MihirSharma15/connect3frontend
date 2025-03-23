@@ -219,7 +219,7 @@ export default function Signup() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full bg-black text-white" disabled={sendOTPMutation.isLoading}>
+              <Button type="submit" className="w-full" disabled={sendOTPMutation.isLoading}>
                 {sendOTPMutation.isLoading ? "Sending OTP..." : "Send OTP"}
               </Button>
             </form>
@@ -259,7 +259,7 @@ export default function Signup() {
               />
               <Button
                 type="submit"
-                className="w-full bg-black text-white"
+                className="w-full"
                 disabled={verifyOTPMutation.isLoading}
               >
                 {verifyOTPMutation.isLoading ? "Verifying..." : "Verify"}
@@ -310,7 +310,7 @@ export default function Signup() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full bg-black text-white">
+              <Button type="submit" className="w-full">
                 Continue
               </Button>
             </form>
