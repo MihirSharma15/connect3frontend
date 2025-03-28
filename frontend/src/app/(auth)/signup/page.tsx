@@ -6,7 +6,6 @@ import { toast } from "@/components/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import { useFieldArray } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -27,7 +26,6 @@ import {
   sendOTP,
   verifyCode,
   registerUser,
-  connectWithFriend,
 } from "@/apis/auth";
 
 const PhoneSchema = z.object({
@@ -55,17 +53,6 @@ const UserDetailsSchema = z.object({
     .regex(/[^A-Za-z0-9]/, {
       message: "Password must contain at least one special character",
     }),
-});
-
-const friendFormSchema = z.object({
-  friends: z
-    .array(
-      z
-        .string()
-        .regex(/^\+?[1-9]\d{1,14}$/, "Invalid phone number format")
-    )
-    .min(1, "Please add at least 1 friend.")
-    .max(3, "You can add up to 3 friends."),
 });
 
 export default function Signup() {
@@ -102,6 +89,7 @@ export default function Signup() {
       registerUser(data, accessToken),
     onSuccess: () => {
       toast({ title: "Account Created", description: "Welcome to CONNECT3!" });
+      router.push("/dashboard");
     },
     onError: (error: any) => {
       toast({ title: "Error", description: error.message });
@@ -114,7 +102,7 @@ export default function Signup() {
   });
 
   const handlePhoneSubmit = ({ phonenumber }: { phonenumber: string }) => {
-    setPhoneNumber(phonenumber);
+    setPhoneNumber("+1" + phonenumber);
     setAccessToken("[REDACTED_JWT]"); // TESTING DELETE LATER
     setStep(3); // TESTING DELETE LATER
     // sendOTPMutation.mutate(phonenumber); UNCOMMENT LATER
@@ -136,67 +124,6 @@ export default function Signup() {
 
   const handleDetailsSubmit = (data: { name: string; password: string }) => {
     registerUserMutation.mutate({ name: data.name, password: data.password, phonenumber });
-    setStep(4);
-  };
-
-  const friendForm = useForm({
-    resolver: zodResolver(friendFormSchema),
-    defaultValues: { friends: [" ", " ", " "] },
-  });
-
-  const { fields, append, remove } = useFieldArray({
-    control: friendForm.control,
-    name: "friends",
-  });
-
-  const [friendErrors, setFriendErrors] = useState<string[]>([]);
-
-  const handleFriendsSubmit = async (data: z.infer<typeof friendFormSchema>) => {
-    const sanitizedFriends = data.friends
-      .map((friend) => friend.trim())
-      .filter((friend) => friend !== "");
-
-    if (sanitizedFriends.length === 0) {
-      toast({
-        title: "Error",
-        description: "Please add at least one valid friend.",
-      });
-      return;
-    }
-
-    const newFriendErrors = Array(sanitizedFriends.length).fill("");
-
-    try {
-      for (const [index, friendPhoneNumber] of sanitizedFriends.entries()) {
-        try {
-          await connectWithFriend(friendPhoneNumber, accessToken);
-        } catch (error: any) {
-          newFriendErrors[index] =
-            error.message || "Failed to connect with this friend.";
-        }
-      }
-
-      setFriendErrors(newFriendErrors);
-
-      const hasErrors = newFriendErrors.some((error) => error !== "");
-      if (!hasErrors) {
-        toast({
-          title: "Connections Successful",
-          description: "All friends are connected!",
-        });
-        router.push("/dashboard");
-      } else {
-        toast({
-          title: "Partial Success",
-          description: "Some connections failed. Please review the errors.",
-        });
-      }
-    } catch (error: any) {
-      toast({
-        title: "Error Creating Connections",
-        description: error.message || "Something went wrong.",
-      });
-    }
   };
 
   return (
@@ -279,7 +206,7 @@ export default function Signup() {
                 <FormLabel>Phone Number</FormLabel>
                 <Input
                   type="text"
-                  value={phonenumber}
+                  value={phonenumber.slice(2)}
                   disabled
                   className="bg-gray-200 cursor-not-allowed"
                 />
@@ -310,60 +237,6 @@ export default function Signup() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
-                Continue
-              </Button>
-            </form>
-          </Form>
-        )}
-
-        {step === 4 && (
-          <Form {...friendForm}>
-            <form
-              onSubmit={friendForm.handleSubmit(handleFriendsSubmit)}
-              className="space-y-4"
-            >
-              {fields.map((field, index) => (
-                <FormField
-                  key={field.id}
-                  control={friendForm.control}
-                  name={`friends.${index}`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Friend {index + 1}</FormLabel>
-                      <FormControl>
-                        <Input placeholder="+1234567890" {...field} />
-                      </FormControl>
-                      <FormMessage>
-                        {friendErrors[index] && (
-                          <span className="text-red-500">
-                            {friendErrors[index]}
-                          </span>
-                        )}
-                      </FormMessage>
-                    </FormItem>
-                  )}
-                />
-              ))}
-
-              <div className="flex justify-between">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => append("")}
-                  disabled={fields.length >= 3}
-                >
-                  Add Friend
-                </Button>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={() => remove(fields.length - 1)}
-                  disabled={fields.length <= 1}
-                >
-                  Remove Friend
-                </Button>
-              </div>
               <Button type="submit" className="w-full">
                 Register
               </Button>
