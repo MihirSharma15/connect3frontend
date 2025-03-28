@@ -109,13 +109,18 @@ export default function Login() {
                 )}
               />
               {/* Submit Button and Signup Link */}
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col items-center space-y-4">
                 <Button type="submit" className="w-full">
                   Log in
                 </Button>
-                <Link href="/signup" className="mt-2 text-sm text-gray-500">
-                  Don&apos;t have an account? Sign up.
-                </Link>
+                <div className="flex items-center gap-2">
+                  Don&apos;t have an account? 
+                  <Link href="/signup">
+                    <Button type="button" size="sm">
+                      Sign up
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </form>
           </Form>
