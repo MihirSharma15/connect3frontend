@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Graph from "./components/graph";
 import { searchUserByName } from "@/apis/auth"; // Import the API function
+import ProtectedRoute from "@/app/(auth)/ProtectedRoute";
 
 export default function Dashboard() {
   // Search input state
@@ -67,6 +68,7 @@ export default function Dashboard() {
   };
 
   return (
+    <ProtectedRoute>
     <div className="relative w-screen h-screen">
       {/* Search Bar */}
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 w-4/5 sm:w-96">
@@ -102,5 +104,6 @@ export default function Dashboard() {
       {/* Graph Component */}
       <Graph nodes={nodes} edges={edges} />
     </div>
+    </ProtectedRoute>
   );
 }

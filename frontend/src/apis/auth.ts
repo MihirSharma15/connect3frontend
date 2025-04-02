@@ -47,7 +47,6 @@ export async function registerUser(
   });
 
   if (!response.ok) {
-    // Log response status and body for debugging
     const errorBody = await response.text();
     console.error("Register user failed. Status:", response.status);
     console.error("Response body:", errorBody);
@@ -81,13 +80,10 @@ export async function loginUser(data: { phonenumber: string; password: string })
     const errorBody = await response.json();
     console.error("Error response body:", errorBody);
 
-    // Handle errorBody as an array of error details
     let errorMessage;
     if (errorBody.detail && Array.isArray(errorBody.detail)) {
-      // If detail is an array of error objects, construct a meaningful error message
       errorMessage = errorBody.detail.map((error: any) => error.msg).join(" | ");
     } else if (errorBody.detail) {
-      // If detail is a single error message, use it
       errorMessage = errorBody.detail;
     } else if (errorBody.message) {
       errorMessage = errorBody.message;
@@ -100,6 +96,46 @@ export async function loginUser(data: { phonenumber: string; password: string })
   }
 
   return await response.json();
+}
+
+export async function registerAndLogin(
+  data: { name: string; password: string; phonenumber: string },
+  accessToken: string
+) {
+  const registerResponse = await registerUser(data, accessToken);
+  
+  const loginResponse = await fetch(`${API_BASE_URL}/token`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams({
+      username: data.phonenumber,
+      password: data.password,
+    }),
+  });
+
+  if (!loginResponse.ok) {
+    const errorBody = await loginResponse.json();
+    console.error("Error response body:", errorBody);
+
+    let errorMessage;
+    if (errorBody.detail && Array.isArray(errorBody.detail)) {
+      errorMessage = errorBody.detail.map((error: any) => error.msg).join(" | ");
+    } else if (errorBody.detail) {
+      errorMessage = errorBody.detail;
+    } else if (errorBody.message) {
+      errorMessage = errorBody.message;
+    } else {
+      errorMessage = "Login failed. Unknown error.";
+      console.warn("Unknown error structure:", errorBody);
+    }
+
+    throw new Error(errorMessage);
+  }
+
+  const loginData = await loginResponse.json();
+  return loginData.access_token; 
 }
 
 

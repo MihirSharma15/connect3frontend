@@ -26,7 +26,10 @@ import {
   sendOTP,
   verifyCode,
   registerUser,
+  loginUser,
 } from "@/apis/auth";
+import { setAuthCookie } from "@/utils/authUtils";
+import UnauthenticatedRoute from "@/app/(auth)/UnauthenticatedRoute";
 
 const PhoneSchema = z.object({
   phonenumber: z
@@ -89,10 +92,22 @@ export default function Signup() {
       registerUser(data, accessToken),
     onSuccess: () => {
       toast({ title: "Account Created", description: "Welcome to CONNECT3!" });
-      router.push("/dashboard");
+      loginMutation.mutate({ phonenumber, password: detailsForm.getValues("password") });
     },
     onError: (error: any) => {
       toast({ title: "Error", description: error.message });
+    },
+  });
+
+  const loginMutation = useMutation({
+    mutationFn: loginUser,
+    onSuccess: (result) => {
+      toast({ title: "User Verified" });
+      setAuthCookie(result.access_token); 
+      router.push("/dashboard");
+    },
+    onError: (error: any) => {
+      toast({ title: "Login Failed", description: error.message });
     },
   });
 
@@ -127,6 +142,7 @@ export default function Signup() {
   };
 
   return (
+    <UnauthenticatedRoute>
     <div className="flex items-center justify-center h-screen w-full bg-blue-500">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
         {step === 1 && (
@@ -245,5 +261,6 @@ export default function Signup() {
         )}
       </div>
     </div>
+    </UnauthenticatedRoute>
   );
 }
