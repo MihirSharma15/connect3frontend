@@ -28,6 +28,7 @@ import {
   loginUser
 } from "@/apis/auth";
 import { useMutation } from "@tanstack/react-query";
+import { setAuthCookie } from "@/utils/authUtils";
 
 const formSchema = z.object({
   phonenumber: z
@@ -42,6 +43,7 @@ const formSchema = z.object({
       message: "Password must contain at least one special character",
     }),
 });
+import UnauthenticatedRoute from "@/app/(auth)/UnauthenticatedRoute";
 
 export default function Login() {
   const router = useRouter();
@@ -51,7 +53,7 @@ export default function Login() {
       mutationFn: loginUser,
       onSuccess: (result) => {
         toast({ title: "User Verified" });
-        setAccessToken(result.access_token);
+        setAuthCookie(result.token);
         router.push("/dashboard");
       },
       onError: (error: any) => {
@@ -70,6 +72,7 @@ export default function Login() {
   }
 
   return (
+    <UnauthenticatedRoute>
     <div className="flex items-center justify-center h-screen w-full bg-blue-500">
       {/* Login Form Card */}
       <Card className="w-full max-w-md p-6 bg-white shadow-lg rounded-lg">
@@ -127,5 +130,6 @@ export default function Login() {
         </CardContent>
       </Card>
     </div>
+    </UnauthenticatedRoute>
   );
 }
