@@ -20,6 +20,7 @@ export default {
 		border: 'var(--border)',
 		ring: 'var(--ring)',
 		ringOffset: 'var(--ring-offset)',
+        customBlue: "#88AAEE",
 		
 		secondaryBlack: '#212121', 
 	  },
@@ -27,7 +28,9 @@ export default {
 		base: '5px'
 	  },
 	  boxShadow: {
-		shadow: 'var(--shadow)'
+		shadow: 'var(--shadow)',
+            'custom-dark': `6px 6px 15px
+                            rgba(0, 0, 0, 0.3)`,
 	  },
 	  translate: {
 		boxShadowX: '4px',
