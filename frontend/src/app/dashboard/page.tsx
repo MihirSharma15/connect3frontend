@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Graph from "./components/graph";
-import { searchUserByName, getCurrentUser } from "@/apis/auth"; // Import the API function
+import { searchUserByName, getCurrentUser, fetchUserGraph } from "@/apis/auth"; // Import the API function
 import { getAuthToken } from "@/utils/authUtils";
 import ProtectedRoute from "@/app/(auth)/ProtectedRoute";
 
@@ -13,6 +13,8 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(false); // Loading state
   const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null); // Debounce timer
   const [user, setUser]  = useState<object>({}); // User's search query
+  const [nodes, setNodes]  = useState<{ name: string, id: string }[]>([]); // User's search query
+  const [edges, setEdges]  = useState<{ source: string, target: string }[]>([]); // User's search query
 
   const userToken : string | undefined = getAuthToken();
   // Fetch the current user when the component mounts
@@ -22,10 +24,23 @@ export default function Dashboard() {
 
     const fetchCurrentUser = async () => {
       try {
-        console.log("tokenis", userToken);
         const user = await getCurrentUser(userToken);
-        console.log(user);
         setUser(user);
+
+        try {
+          let { nodes, edges } = await fetchUserGraph(user.remaining_connections > 0 ? 1 : 4, userToken);
+          if (user.remaining_connections > 0) {
+            //Add blank nodes with ? in them
+            for (let i = 0; i < user.remaining_connections; i++) {
+              nodes.push({ name: "?", user_id: `blank${i}` });
+              edges.push({ source: `blank${i}`, target: user.user_id });
+            }
+          }
+          setNodes(nodes.map(n => ({ name: n.name, id: n.user_id })));
+          setEdges(edges);
+        } catch (error) {
+          console.error("Error fetching graph:", error);
+        }
       } catch (error) {
         console.error("Error fetching current user:", error);
       }
@@ -33,20 +48,6 @@ export default function Dashboard() {
 
     fetchCurrentUser();
   }, [userToken]);
-
-  // Example graph data
-  const nodes = [
-    { id: 1, name: "Alice" },
-    { id: 2, name: "Bob" },
-    { id: 3, name: "Charlie" },
-    { id: 4, name: "David" },
-  ];
-
-  const edges = [
-    { source: 1, target: 2 },
-    { source: 2, target: 3 },
-    { source: 3, target: 4 },
-  ];
 
   // Fetch users by name
   const fetchUsers = async (query: string) => {
