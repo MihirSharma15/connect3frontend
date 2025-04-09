@@ -3,7 +3,26 @@
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
 
+function ordinal_suffix_of(i) {
+  let j = i % 10,
+      k = i % 100;
+  if (j === 1 && k !== 11) {
+      return i + "st";
+  }
+  if (j === 2 && k !== 12) {
+      return i + "nd";
+  }
+  if (j === 3 && k !== 13) {
+      return i + "rd";
+  }
+  return i + "th";
+}
+
 export default function Graph({ nodes, edges }) {
+  const colorScale = d3.scaleLinear()
+    .domain([0, d3.max(nodes, (d) => d.degree)])  // Range based on degree 0 to the max degree
+    .range(["#88aaee", "#dae4f5"]);  // Lighter shades of #88aaee
+
   const svgRef = useRef(null);
 
   useEffect(() => {
@@ -35,7 +54,7 @@ export default function Graph({ nodes, edges }) {
           .distance(150)
       )
       .force("charge", d3.forceManyBody().strength(-200))
-      .force("collision", d3.forceCollide().radius(40));
+      .force("collision", d3.forceCollide().radius(60));
 
     const link = g
       .append("g")
@@ -58,7 +77,7 @@ export default function Graph({ nodes, edges }) {
 
 const texts = nodeGroup
 .append("text")
-.text((d) => d.name)
+.text((d) => `${d.name}${d.degree ? ` (${ordinal_suffix_of(d.degree)})` : "" }`)
 .attr("text-anchor", "middle")
 .attr("dy", 5)
 .style("font-weight", "bold")
@@ -78,7 +97,7 @@ group
   .attr("width", bbox.width + padding * 2)
   .attr("height", bbox.height + padding * 2)
   .attr("rx", 6)
-  .attr("fill", "#fff")
+  .attr("fill", (d) => colorScale(d.degree) || "#fff")
   .attr("stroke", "#000")
   .attr("stroke-width", 2)
   .attr("filter", "drop-shadow(4px 4px 0px black)");

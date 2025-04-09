@@ -11,7 +11,6 @@ import {
 import ShareButton from "./ShareButton";
 
 export default function ShareDialog({ num_connections, invite_code } : { num_connections: number, invite_code: string }) {
-    console.log(invite_code)
     return (<Dialog open={true} onOpenChange={() => {}}>
           <DialogContent className="bg-white [&>button]:hidden">
             <DialogHeader>

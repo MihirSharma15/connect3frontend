@@ -39,7 +39,7 @@ export default function Dashboard() {
               edges.push({ source: `blank${i}`, target: user.user_id });
             }
           }
-          setNodes(nodes.map(n => ({ name: n.name, id: n.user_id })));
+          setNodes(nodes.map(n => ({ name: n.name, id: n.user_id, degree: n.user_id === user.user_id ? 0 : n.degree })));
           setEdges(edges);
         } catch (error) {
           console.error("Error fetching graph:", error);
