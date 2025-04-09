@@ -56,7 +56,6 @@ export default function Graph({ nodes, edges }) {
       .append("g")
       .attr("class", "node-group");
 
-    // First add text so we can measure it
 const texts = nodeGroup
 .append("text")
 .text((d) => d.name)
@@ -64,9 +63,8 @@ const texts = nodeGroup
 .attr("dy", 5)
 .style("font-weight", "bold")
 .style("font-size", "12px")
-.style("pointer-events", "none"); // makes interaction easier
+.style("pointer-events", "none"); 
 
-// Then add rects based on text size
 nodeGroup.each(function (d, i) {
 const group = d3.select(this);
 const text = group.select("text");
@@ -74,7 +72,7 @@ const bbox = text.node().getBBox();
 const padding = 10;
 
 group
-  .insert("rect", "text") // insert rect before text
+  .insert("rect", "text")
   .attr("x", bbox.x - padding)
   .attr("y", bbox.y - padding)
   .attr("width", bbox.width + padding * 2)

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from "@/components/ui/button";
 
 function ShareButton({ title, text, url } : { title: string, text: string, url: string}) {
   const handleShare = async () => {
@@ -18,9 +19,9 @@ function ShareButton({ title, text, url } : { title: string, text: string, url: 
   };
 
   return (
-    <button onClick={handleShare}>
+    <Button onClick={handleShare}>
       Share
-    </button>
+    </Button>
   );
 }
 
