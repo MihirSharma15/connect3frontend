@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import Graph from "./components/graph";
-import { searchUserByName } from "@/apis/auth"; // Import the API function
+import { searchUserByName, getCurrentUser } from "@/apis/auth"; // Import the API function
+import { getAuthToken } from "@/utils/authUtils";
 import ProtectedRoute from "@/app/(auth)/ProtectedRoute";
 
 export default function Dashboard() {
@@ -11,6 +12,27 @@ export default function Dashboard() {
   const [results, setResults] = useState([]); // Search results
   const [isLoading, setIsLoading] = useState(false); // Loading state
   const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null); // Debounce timer
+  const [user, setUser]  = useState<object>({}); // User's search query
+
+  const userToken : string | undefined = getAuthToken();
+  // Fetch the current user when the component mounts
+
+  useEffect(() => {
+    if (!userToken) return;
+
+    const fetchCurrentUser = async () => {
+      try {
+        console.log("tokenis", userToken);
+        const user = await getCurrentUser(userToken);
+        console.log(user);
+        setUser(user);
+      } catch (error) {
+        console.error("Error fetching current user:", error);
+      }
+    };
+
+    fetchCurrentUser();
+  }, [userToken]);
 
   // Example graph data
   const nodes = [

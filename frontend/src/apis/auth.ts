@@ -179,14 +179,20 @@ export async function connectWithFriend(receiverPhoneNumber: string, token: stri
   }
 }
 
-export async function searchUserByName(name: string): Promise<UserInDb[]> {
-  const response = await fetch(`${API_BASE_URL}/api/${name}`, {
+export async function getCurrentUser(token: string): Promise<UserInDb[]> {
+  return searchUserByName("me", token);
+}
+
+export async function searchUserByName(name: string, token: string): Promise<UserInDb[]> {
+  const response = await fetch(`${API_BASE_URL}/users/${name}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("accessToken")}`, // Ensure the token exists
+      Authorization: `Bearer ${token}`, // Ensure the token exists
     },
   });
+
+  console.log(name, response);
 
   if (!response.ok) {
     if (response.status === 404) {
@@ -198,11 +204,10 @@ export async function searchUserByName(name: string): Promise<UserInDb[]> {
   return response.json(); // Return user data from the API
 }
 
-export async function fetchUserGraph(degrees: number = 6) {
+export async function fetchUserGraph(degrees: number = 6, token: string) {
   // Retrieve the token from localStorage
-  const token = localStorage.getItem("accessToken");
   if (!token) {
-    throw new Error("No access token found in localStorage.");
+    throw new Error("No access token provided.");
   }
 
   const response = await fetch(`${API_BASE_URL}/users/graph?degrees=${degrees}`, {
