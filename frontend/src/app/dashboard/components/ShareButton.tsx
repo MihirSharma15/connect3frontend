@@ -11,10 +11,10 @@ function ShareButton({ title, text, url } : { title: string, text: string, url: 
           url: url,
         });
       } catch (error) {
-        console.error('Error sharing:', error);
+        //console.error('Error sharing:', error);
       }
     } else {
-      alert('Web Share API is not supported in this browser.');
+      //alert('Web Share API is not supported in this browser.');
     }
   };
 

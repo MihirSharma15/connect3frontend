@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Graph from "./components/graph";
-import { searchUserByName, getCurrentUser, fetchUserGraph } from "@/apis/auth"; // Import the API function
+import { fetchShortestPathTo, getCurrentUser, fetchUserGraph } from "@/apis/auth"; // Import the API function
 import { getAuthToken } from "@/utils/authUtils";
 import ProtectedRoute from "@/app/(auth)/ProtectedRoute";
 import ShareDialog from "./components/ShareDialog";
@@ -12,7 +12,7 @@ localStorage.theme = 'light';
 export default function Dashboard() {
   // Search input state
   const [search, setSearch] = useState(""); // User's search query
-  const [results, setResults] = useState([]); // Search results
+  const [highlightEdges, setHighlightEdges] = useState([]); // Search results
   const [isLoading, setIsLoading] = useState(false); // Loading state
   const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null); // Debounce timer
   const [user, setUser]  = useState<object>({}); // User's search query
@@ -31,8 +31,8 @@ export default function Dashboard() {
         setUser(user);
 
         try {
-          let { nodes, edges } = await fetchUserGraph(user.remaining_connections > 0 ? 1 : 4, userToken);
-          if (user.remaining_connections > 0) {
+          let { nodes, edges } = await fetchUserGraph(false && user.remaining_connections > 0 ? 1 : 4, userToken);
+          if (false && user.remaining_connections > 0) {
             //Add blank nodes with ? in them
             for (let i = 0; i < user.remaining_connections; i++) {
               nodes.push({ name: "?", user_id: `blank${i}` });
@@ -55,21 +55,30 @@ export default function Dashboard() {
   // Fetch users by name
   const fetchUsers = async (query: string) => {
     if (!query.trim()) {
-      setResults([]); // Clear results for empty input
+      setHighlightEdges([]); // Clear results for empty input
       return;
     }
 
+    const data = nodes.find(node => node.name.toLowerCase() === query.toLowerCase());
+
     try {
       setIsLoading(true); // Set loading state
-      const data = await searchUserByName(query);
-      setResults(data); // Save the search results
+      const shortestPath = await fetchShortestPathTo(data.id, userToken);
+      setHighlightEdges(shortestPath); // Save the search results
     } catch (error) {
-      console.error(error.message);
-      setResults([]); // Clear results if there's an error
+      setHighlightEdges([]); // Clear results if there's an error
     } finally {
       setIsLoading(false); // Clear loading state
     }
   };
+
+  useEffect(() => {
+    if (search.trim()) {
+      fetchUsers(search);
+    } else {
+      setHighlightEdges([]); // Clear results for empty input
+    }
+  }, [search, nodes]); // Re-fetch when search or nodes change
 
   // Debounced search input handler
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,9 +117,9 @@ export default function Dashboard() {
 
         {/* Dropdown for search results */}
         {isLoading && <div className="mt-2 text-sm text-gray-500">Loading...</div>}
-        {!isLoading && results.length > 0 && (
+        {/*!isLoading && results.length > 0 && (
           <div className="mt-2 bg-white border border-gray-300 rounded shadow">
-            {results.map((user: any) => (
+            {high.map((user: any) => (
               <div
                 key={user.id}
                 className="p-2 hover:bg-gray-100 cursor-pointer"
@@ -121,16 +130,16 @@ export default function Dashboard() {
               </div>
             ))}
           </div>
-        )}
-        {!isLoading && search.trim() && results.length === 0 && (
+        )*/}
+        {!isLoading && search.trim() && highlightEdges.length === 0 && (
           <div className="mt-2 text-sm text-red-500">No users found.</div>
         )}
       </div>
 
       {/* Graph Component */}
-      <Graph nodes={nodes} edges={edges} />
+      <Graph nodes={nodes} edges={edges} setQuery={setSearch} highlightEdges={highlightEdges} />
 
-      {user.remaining_connections > 0 && (<ShareDialog num_connections={3-user.remaining_connections} invite_code={user.invite_code}/>)}
+      {false && user.remaining_connections > 0 && (<ShareDialog num_connections={3-user.remaining_connections} invite_code={user.invite_code}/>)}
     </div>
     </ProtectedRoute>
   );

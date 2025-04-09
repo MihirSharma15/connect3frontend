@@ -166,7 +166,6 @@ export async function connectWithFriend(receiverPhoneNumber: string, token: stri
       }
     }
 
-    console.log("API Response:", responseText);
     return JSON.parse(responseText);
   } catch (error) {
     if (typeof responseText === "string") {
@@ -188,11 +187,9 @@ export async function searchUserByName(name: string, token: string): Promise<Use
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`, // Ensure the token exists
+      Authorization: `Bearer ${token}`,
     },
   });
-
-  console.log(name, response);
 
   if (!response.ok) {
     if (response.status === 404) {
@@ -201,11 +198,10 @@ export async function searchUserByName(name: string, token: string): Promise<Use
     throw new Error("Failed to search user");
   }
 
-  return response.json(); // Return user data from the API
+  return response.json();
 }
 
 export async function fetchUserGraph(degrees: number = 6, token: string) {
-  // Retrieve the token from localStorage
   if (!token) {
     throw new Error("No access token provided.");
   }
@@ -214,7 +210,7 @@ export async function fetchUserGraph(degrees: number = 6, token: string) {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`, // Use token from localStorage
+      Authorization: `Bearer ${token}`,
     },
   });
 
@@ -224,6 +220,27 @@ export async function fetchUserGraph(degrees: number = 6, token: string) {
   }
 
   return response.json(); // Expected format: { nodes: [...], edges: [...] }
+}
+
+export async function fetchShortestPathTo(user: string, token: string) {
+  if (!token) {
+    throw new Error("No access token provided.");
+  }
+
+  const response = await fetch(`${API_BASE_URL}/users/id/${user}/shortest-path`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`Error fetching graph: ${response.statusText} - ${errorBody}`);
+  }
+
+  return response.json();
 }
 
 
