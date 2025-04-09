@@ -18,10 +18,21 @@ function ordinal_suffix_of(i) {
   return i + "th";
 }
 
-export default function Graph({ nodes, edges }) {
+export default function Graph({ nodes, edges, highlightEdges=[], setQuery }) {
   const colorScale = d3.scaleLinear()
     .domain([0, d3.max(nodes, (d) => d.degree)])  // Range based on degree 0 to the max degree
     .range(["#88aaee", "#dae4f5"]);  // Lighter shades of #88aaee
+
+  const highlightEdgeSet : string[] = [];
+  if (highlightEdges.connections) {
+    const highlightEdgeConnections = highlightEdges.connections;
+    for (let i = 0; i < highlightEdgeConnections.length - 1; i++) {
+      const from = highlightEdgeConnections[i].user_id;
+      const to = highlightEdgeConnections[i + 1].user_id;
+      highlightEdgeSet.push(`${from}-${to}`);
+      highlightEdgeSet.push(`${to}-${from}`); // if edges are undirected
+    }
+  }
 
   const svgRef = useRef(null);
 
@@ -40,8 +51,12 @@ export default function Graph({ nodes, edges }) {
     svg.call(zoom);
 
     if (nodes[0]) {
+      //let connections = highlightEdges.connections;
+      //console.log(connections)
+      //let node = connections?.length ? nodes.find(d => d.id === connections[connections.length-1].user_id) || nodes[0] : nodes[0]
       nodes[0].fx = width / 2;
       nodes[0].fy = height / 2;
+      nodes[0].fixed = true;
     }
 
     const simulation = d3
@@ -63,8 +78,12 @@ export default function Graph({ nodes, edges }) {
       .data(edges)
       .enter()
       .append("line")
-      .attr("stroke", "#666")
-      .attr("stroke-width", 2);
+      .attr("stroke", (d) =>
+        highlightEdgeSet.includes(`${d.source.id}-${d.target.id}`) ? "#3399ff" : "#666"
+      )
+      .attr("stroke-width", (d) =>
+        highlightEdgeSet.includes(`${d.source.id}-${d.target.id}`) ? 4 : 2
+      );
 
     const nodeGroup = g
       .append("g")
@@ -73,7 +92,12 @@ export default function Graph({ nodes, edges }) {
       .data(nodes)
       .enter()
       .append("g")
-      .attr("class", "node-group");
+      .attr("class", "node-group")
+      .on("click", (event, d) => {
+        if (setQuery) {
+          setQuery(d.name); // or setQuery(d.user_id) or any field you prefer
+        }
+      });
 
 const texts = nodeGroup
 .append("text")
@@ -97,7 +121,7 @@ group
   .attr("width", bbox.width + padding * 2)
   .attr("height", bbox.height + padding * 2)
   .attr("rx", 6)
-  .attr("fill", (d) => colorScale(d.degree) || "#fff")
+  .attr("fill", (d) => highlightEdgeSet.find(c => c.startsWith(d.id) || c.endsWith(d.id)) ? ("#6ed8ff") : (colorScale(d.degree) || "#fff"))
   .attr("stroke", "#000")
   .attr("stroke-width", 2)
   .attr("filter", "drop-shadow(4px 4px 0px black)");
@@ -112,7 +136,7 @@ group
 
       nodeGroup.attr("transform", (d) => `translate(${d.x},${d.y})`);
     });
-  }, [nodes, edges]);
+  }, [nodes, edges, highlightEdges, setQuery, colorScale, highlightEdgeSet]);
 
   return (
     <svg

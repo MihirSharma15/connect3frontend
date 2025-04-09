@@ -1,11 +1,9 @@
-import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTrigger,
   DialogTitle
 } from "@/components/ui/dialog"
 import ShareButton from "./ShareButton";
