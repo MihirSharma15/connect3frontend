@@ -5,6 +5,9 @@ import Graph from "./components/graph";
 import { searchUserByName, getCurrentUser, fetchUserGraph } from "@/apis/auth"; // Import the API function
 import { getAuthToken } from "@/utils/authUtils";
 import ProtectedRoute from "@/app/(auth)/ProtectedRoute";
+import ShareDialog from "./components/ShareDialog";
+
+localStorage.theme = 'light';
 
 export default function Dashboard() {
   // Search input state
@@ -126,6 +129,8 @@ export default function Dashboard() {
 
       {/* Graph Component */}
       <Graph nodes={nodes} edges={edges} />
+
+      {user.remaining_connections > 0 && (<ShareDialog num_connections={3-user.remaining_connections} invite_code={user.invite_code}/>)}
     </div>
     </ProtectedRoute>
   );
