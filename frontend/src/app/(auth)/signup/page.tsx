@@ -6,6 +6,7 @@ import { toast } from "@/components/hooks/use-toast";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
+import { useFieldArray, useForm } from "react-hook-form";
 
 import {
   Card,
@@ -22,9 +23,7 @@ import {
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from '@/components/ui/input-otp'
-
-import { useForm } from "react-hook-form";
+} from "@/components/ui/input-otp";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
