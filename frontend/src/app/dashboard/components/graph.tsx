@@ -18,7 +18,7 @@ function ordinal_suffix_of(i) {
   return i + "th";
 }
 
-export default function Graph({ nodes, edges, highlightEdges=[], setQuery }) {
+function Graph({ nodes, edges, highlightEdges=[], setQuery }) {
   const colorScale = d3.scaleLinear()
     .domain([0, d3.max(nodes, (d) => d.degree)])  // Range based on degree 0 to the max degree
     .range(["#88aaee", "#dae4f5"]);  // Lighter shades of #88aaee
@@ -62,10 +62,11 @@ export default function Graph({ nodes, edges, highlightEdges=[], setQuery }) {
 
     svg.call(zoom);
 
-    if (nodes[0]) {
-      nodes[0].fx = width / 2;
-      nodes[0].fy = height / 2;
-      nodes[0].fixed = true;
+    let userNode = nodes.find(n => n.degree === 0);
+    if (userNode) {
+      userNode.fx = width / 2;
+      userNode.fy = height / 2;
+      userNode.fixed = true;
     }
 
     const link = g
@@ -146,3 +147,5 @@ group
     />
   );
 }
+
+export default React.memo(Graph);
