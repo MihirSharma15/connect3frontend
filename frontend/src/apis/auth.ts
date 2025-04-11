@@ -1,6 +1,6 @@
 "use server"
 
-import { getAuthToken } from "@/utils/authUtils";
+import { getAuthTokenServer } from "@/utils/authUtils.server";
 
 const API_BASE_URL = "https://api.connect3.live";
 
@@ -181,11 +181,12 @@ export async function connectWithFriend(receiverPhoneNumber: string, token: stri
 }
 
 export async function searchUserByName(name: string): Promise<UserInDb[]> {
+  const token = await getAuthTokenServer();
   const response = await fetch(`${API_BASE_URL}/api/${name}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("accessToken")}`, // Ensure the token exists
+      Authorization: `Bearer ${token}`,
     },
   });
 
@@ -196,21 +197,16 @@ export async function searchUserByName(name: string): Promise<UserInDb[]> {
     throw new Error("Failed to search user");
   }
 
-  return response.json(); // Return user data from the API
+  return response.json();
 }
 
 export async function fetchUserGraph(degrees: number = 6) {
-  // Retrieve the token from localStorage
-  const token = localStorage.getItem("accessToken");
-  if (!token) {
-    throw new Error("No access token found in localStorage.");
-  }
-
+  const token = await getAuthTokenServer();
   const response = await fetch(`${API_BASE_URL}/users/graph?degrees=${degrees}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`, // Use token from localStorage
+      Authorization: `Bearer ${token}`,
     },
   });
 
@@ -237,20 +233,18 @@ export async function searchUserByInviteCode(code: string) {
 }
 
 export async function connectByInviteCode(code: string) {
-  const token = getAuthToken();
+  const token = await getAuthTokenServer();
   const response = await fetch(`${API_BASE_URL}/connect-by-code`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${token}`,
     },
-    // The backend expects an object with a "code" property.
     body: JSON.stringify({ code }),
   });
 
   if (!response.ok) {
     const errorData = await response.json();
-    // A simple error message (you can change this if needed)
     throw new Error(errorData.detail || "Failed to connect by invite code.");
   }
   return await response.json();
