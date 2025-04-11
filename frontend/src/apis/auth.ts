@@ -167,7 +167,6 @@ export async function connectWithFriend(receiverPhoneNumber: string, token: stri
       }
     }
 
-    console.log("API Response:", responseText);
     return JSON.parse(responseText);
   } catch (error) {
     if (typeof responseText === "string") {
@@ -180,9 +179,12 @@ export async function connectWithFriend(receiverPhoneNumber: string, token: stri
   }
 }
 
-export async function searchUserByName(name: string): Promise<UserInDb[]> {
-  const token = await getAuthTokenServer();
-  const response = await fetch(`${API_BASE_URL}/api/${name}`, {
+export async function getCurrentUser(token: string): Promise<UserInDb[]> {
+  return searchUserByName("me", token);
+}
+
+export async function searchUserByName(name: string, token: string): Promise<UserInDb[]> {
+  const response = await fetch(`${API_BASE_URL}/users/${name}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -232,6 +234,26 @@ export async function searchUserByInviteCode(code: string) {
   return await response.json();
 }
 
+export async function fetchShortestPathTo(user: string, token: string) {
+  if (!token) {
+    throw new Error("No access token provided.");
+  }
+
+  const response = await fetch(`${API_BASE_URL}/users/id/${user}/shortest-path`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`Error fetching graph: ${response.statusText} - ${errorBody}`);
+  }
+
+  return response.json();
+}
 export async function connectByInviteCode(code: string) {
   const token = await getAuthTokenServer();
   console.log("Connecting by token:", token);
