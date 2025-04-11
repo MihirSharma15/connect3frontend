@@ -7,8 +7,6 @@ import { getAuthToken } from "@/utils/authUtils";
 import ProtectedRoute from "@/app/(auth)/ProtectedRoute";
 import ShareDialog from "./components/ShareDialog";
 
-localStorage.theme = 'light';
-
 export default function Dashboard() {
   // Search input state
   const [search, setSearch] = useState(""); // User's search query
