@@ -1,5 +1,7 @@
 "use server"
 
+import { getAuthTokenServer } from "@/utils/authUtils.server";
+
 const API_BASE_URL = "https://api.connect3.live";
 
 export async function sendOTP(phonenumber: string) {
@@ -32,7 +34,6 @@ export async function verifyCode(data: { phonenumber: string; code: string }) {
   return result;
 }
 
-// apis/auth.ts
 export async function registerUser(
   data: { name: string; password: string; phonenumber: string },
   token: string
@@ -201,11 +202,8 @@ export async function searchUserByName(name: string, token: string): Promise<Use
   return response.json();
 }
 
-export async function fetchUserGraph(degrees: number = 6, token: string) {
-  if (!token) {
-    throw new Error("No access token provided.");
-  }
-
+export async function fetchUserGraph(degrees: number = 6) {
+  const token = await getAuthTokenServer();
   const response = await fetch(`${API_BASE_URL}/users/graph?degrees=${degrees}`, {
     method: "GET",
     headers: {
@@ -220,6 +218,20 @@ export async function fetchUserGraph(degrees: number = 6, token: string) {
   }
 
   return response.json(); // Expected format: { nodes: [...], edges: [...] }
+}
+
+export async function searchUserByInviteCode(code: string) {
+  const response = await fetch(`${API_BASE_URL}/users/code/${code}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.detail || "User not found or invite code is not valid.");
+  }
+
+  return await response.json();
 }
 
 export async function fetchShortestPathTo(user: string, token: string) {
@@ -242,6 +254,38 @@ export async function fetchShortestPathTo(user: string, token: string) {
 
   return response.json();
 }
+export async function connectByInviteCode(code: string) {
+  const token = await getAuthTokenServer();
+  console.log("Connecting by token:", token);
+  console.log(token);
+  const response = await fetch(`${API_BASE_URL}/users/connect-by-code`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+    body: JSON.stringify({ code }),
+  });
 
-
-  
+  if (!response.ok) {
+    let errorData;
+    try {
+      errorData = await response.json();
+    } catch {
+      errorData = { detail: response.statusText };
+    }
+    let detailedErrorMessage: string;
+    if (Array.isArray(errorData.detail)) {
+      // If detail is an array of errors, join their messages
+      detailedErrorMessage = errorData.detail.map((d: any) => d.msg).join(", ");
+    } else if (typeof errorData.detail === "string") {
+      detailedErrorMessage = errorData.detail;
+    } else {
+      detailedErrorMessage = JSON.stringify(errorData);
+    }
+    throw new Error(
+      `Error ${response.status} (${response.statusText}): ${detailedErrorMessage}`
+    );
+  }
+  return await response.json();
+}
