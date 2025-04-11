@@ -1,5 +1,7 @@
 "use server"
 
+import { getAuthToken } from "@/utils/authUtils";
+
 const API_BASE_URL = "https://api.connect3.live";
 
 export async function sendOTP(phonenumber: string) {
@@ -32,7 +34,6 @@ export async function verifyCode(data: { phonenumber: string; code: string }) {
   return result;
 }
 
-// apis/auth.ts
 export async function registerUser(
   data: { name: string; password: string; phonenumber: string },
   token: string
@@ -221,5 +222,36 @@ export async function fetchUserGraph(degrees: number = 6) {
   return response.json(); // Expected format: { nodes: [...], edges: [...] }
 }
 
+export async function searchUserByInviteCode(code: string) {
+  const response = await fetch(`${API_BASE_URL}/users/code/${code}`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
 
-  
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.detail || "User not found or invite code is not valid.");
+  }
+
+  return await response.json();
+}
+
+export async function connectByInviteCode(code: string) {
+  const token = getAuthToken();
+  const response = await fetch(`${API_BASE_URL}/connect-by-code`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+    // The backend expects an object with a "code" property.
+    body: JSON.stringify({ code }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    // A simple error message (you can change this if needed)
+    throw new Error(errorData.detail || "Failed to connect by invite code.");
+  }
+  return await response.json();
+}
