@@ -49,7 +49,6 @@ import UnauthenticatedRoute from "@/app/(auth)/UnauthenticatedRoute";
 
 export default function Login() {
   const router = useRouter();
-  const [accessToken, setAccessToken] = useState("");
   const [inviteError, setInviteError] = useState<string | null>(null);
 
   const searchParams = useSearchParams();
@@ -72,9 +71,10 @@ export default function Login() {
       mutationFn: loginUser,
       onSuccess: (result) => {
         toast({ title: "User Verified" });
-        setAuthCookie(result.token);
+        setAuthCookie(result.access_token);
         if (inviteCode) {
           connectMutation.mutate(inviteCode);
+          router.push("/dashboard");
         } else {
           router.push("/dashboard");
         }
