@@ -131,9 +131,8 @@ export default function Signup() {
       setAuthCookie(result.access_token); 
       if (inviteCode) {
         connectMutation.mutate(inviteCode);
-      } else {
-        router.push("/dashboard");
       }
+      router.push("/dashboard");
     },
     onError: (error: any) => {
       toast({ title: "Login Failed", description: error.message });

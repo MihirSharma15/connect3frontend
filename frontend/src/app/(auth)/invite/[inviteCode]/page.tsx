@@ -52,7 +52,7 @@ export default async function InvitePage({ params }: InvitePageProps) {
   return (
     <div className="flex flex-col items-center justify-center absolute inset-0 -z-10 h-full w-full bg-white bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]">
       {/* Main Heading */}
-      <h1 className="text-4xl font-bold mb-8">
+      <h1 className="text-4xl font-bold mb-8 text-black">
         CONNECT<span className="text-customBlue">3</span>
       </h1>
 
