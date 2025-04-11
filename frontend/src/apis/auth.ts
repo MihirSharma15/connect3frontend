@@ -234,7 +234,9 @@ export async function searchUserByInviteCode(code: string) {
 
 export async function connectByInviteCode(code: string) {
   const token = await getAuthTokenServer();
-  const response = await fetch(`${API_BASE_URL}/connect-by-code`, {
+  console.log("Connecting by token:", token);
+  console.log(token);
+  const response = await fetch(`${API_BASE_URL}/users/connect-by-code`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -244,8 +246,24 @@ export async function connectByInviteCode(code: string) {
   });
 
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.detail || "Failed to connect by invite code.");
+    let errorData;
+    try {
+      errorData = await response.json();
+    } catch {
+      errorData = { detail: response.statusText };
+    }
+    let detailedErrorMessage: string;
+    if (Array.isArray(errorData.detail)) {
+      // If detail is an array of errors, join their messages
+      detailedErrorMessage = errorData.detail.map((d: any) => d.msg).join(", ");
+    } else if (typeof errorData.detail === "string") {
+      detailedErrorMessage = errorData.detail;
+    } else {
+      detailedErrorMessage = JSON.stringify(errorData);
+    }
+    throw new Error(
+      `Error ${response.status} (${response.statusText}): ${detailedErrorMessage}`
+    );
   }
   return await response.json();
 }
