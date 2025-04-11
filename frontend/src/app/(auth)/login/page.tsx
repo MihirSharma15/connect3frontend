@@ -69,10 +69,8 @@ export default function Login() {
         setAuthCookie(result.access_token);
         if (inviteCode) {
           connectMutation.mutate(inviteCode);
-          router.push("/dashboard");
-        } else {
-          router.push("/dashboard");
         }
+        router.push("/dashboard");
       },
       onError: (error: any) => {
         toast({ title: "Error", description: error.message });
