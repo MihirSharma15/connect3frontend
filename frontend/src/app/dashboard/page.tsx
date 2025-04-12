@@ -36,7 +36,7 @@ export default function Dashboard() {
         setUser(user);
 
         try {
-          let { nodes, edges } = await fetchUserGraph(user.remaining_connections > 0 ? 1 : 6, userToken);
+          let { nodes, edges } = await fetchUserGraph(user.remaining_connections > 0 ? 1 : 5, userToken);
           console.log(nodes)
           if (user.remaining_connections > 0) {
             //Add blank nodes with ? in them
