@@ -63,7 +63,7 @@ export default function Dashboard() {
     if (!query.trim()) {
       setResults([]); // Clear results for empty input
       return;
-    }
+    } // test
 
     const data = nodes.find(node => node.name.toLowerCase() === query.toLowerCase());
 
