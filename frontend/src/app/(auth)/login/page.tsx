@@ -41,8 +41,6 @@ const formSchema = z.object({
     .string()
 });
 import UnauthenticatedRoute from "@/app/(auth)/UnauthenticatedRoute";
-import { Props } from "next/script";
-import { PageProps } from "../../../../.next/types/app/layout";
 
 export default function Login() {
   const router = useRouter();

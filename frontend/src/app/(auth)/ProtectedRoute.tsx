@@ -18,24 +18,6 @@ export default function ProtectedRoute({
         router.push("/login");
         return;
       }
-
-      /**
-      // Verify token's validity with the backend
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/validate`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        removeAuthCookie();
-        router.push("/login");
-      } else {
-        console.log("User is authenticated");
-      }
-    */
-
     };
 
     checkAuthentication();
