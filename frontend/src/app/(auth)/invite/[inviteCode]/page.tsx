@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { getAuthTokenServer } from "@/utils/authUtils.server";
 import { Props } from "next/script";
+import { PageProps } from "../../../../../.next/types/app/layout";
 
 type InviteData = {
   user_id: string;
@@ -26,7 +27,7 @@ type InvitePageProps = {
   params: { inviteCode: string };
 };
 
-export default async function InvitePage({ params }: Props) {
+export default async function InvitePage({ params }: PageProps) {
   const { inviteCode } = await params;
   let inviteData: InviteData;
 
