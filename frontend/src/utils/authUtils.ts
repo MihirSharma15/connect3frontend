@@ -12,7 +12,7 @@ export const setAuthCookie = (token: string) => {
   document.cookie = `auth_token=${token}; ${cookieOptions}`;
 };
 
-export const getAuthToken = () => {
+export const getAuthToken = (document: Document) => {
   return document.cookie
     .split('; ')
     .find(row => row.startsWith('auth_token='))
