@@ -13,6 +13,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { getAuthTokenServer } from "@/utils/authUtils.server";
 
 type InviteData = {
   user_id: string;
@@ -28,6 +29,9 @@ export default async function InvitePage({ params }: InvitePageProps) {
   const { inviteCode } = await params;
   let inviteData: InviteData;
 
+  let loggedInUser = await getAuthTokenServer();
+
+  console.log(loggedInUser)
   try {
     inviteData = await searchUserByInviteCode(inviteCode);
   } catch (error: any) {
@@ -71,25 +75,25 @@ export default async function InvitePage({ params }: InvitePageProps) {
         </CardHeader>
 
         {/* Main Card Content */}
-        <CardContent className="p-0 mb-8">
+        <CardContent className="p-0 ">
           <div className="space-y-8">
-          <Link href={inviteData.remaining_connections > 0 ? `/signup?inviteCode=${inviteCode}` : "/signup"} passHref>
+          <Link href={inviteData.remaining_connections > 0 ? `/${loggedInUser ? "login" : "signup"}?inviteCode=${inviteCode}` : "/signup"} passHref>
             <Button
               type="button"
               className="w-full bg-customBlue"
             >
-              Sign Up {inviteData.remaining_connections > 0 ? "to Connect" : "Anyways"} →
+              {loggedInUser ? "Accept Connection →" : `Sign Up ${inviteData.remaining_connections > 0 ? "to Connect" : "Anyways"} →`}
             </Button>
             </Link>
-            <hr className="border-black" />
-            <p className="text-center text-base mt-4">
-              Already have an account?{" "}
-              <Link href={`/login?inviteCode=${inviteCode}`} passHref>
-              <Button type="button" className="bg-customBlue" size="sm">
-                Log In
-              </Button>
-              </Link>
-            </p>
+            {!loggedInUser && (
+            <><hr className="border-black" /><p className="text-center text-base mt-4">
+                Already have an account?{" "}
+                <Link href={`/login?inviteCode=${inviteCode}`} passHref>
+                  <Button type="button" className="bg-customBlue" size="sm">
+                    Log In
+                  </Button>
+                </Link>
+              </p></>)}
           </div>
         </CardContent>
 

@@ -10,7 +10,7 @@ import ShareButton from "./ShareButton";
 
 export default function ShareDialog({ num_connections, invite_code } : { num_connections: number, invite_code: string }) {
     return (<Dialog open={true} onOpenChange={() => {}}>
-          <DialogContent className="bg-white [&>button]:hidden">
+          <DialogContent className="bg-white [&>button]:hidden text-black">
             <DialogHeader>
                 <DialogTitle>Unlock Your Network</DialogTitle>
               <DialogDescription>
