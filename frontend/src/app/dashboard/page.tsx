@@ -19,7 +19,7 @@ export default function Dashboard() {
   const [nodes, setNodes]  = useState<{ name: string, id: string }[]>([]); // Nodes in the graph
   const [edges, setEdges]  = useState<{ source: string, target: string }[]>([]); // Edges in the graph
 
-  const userToken : string | undefined = getAuthToken();
+  const userToken : string | undefined = getAuthToken(document);
 
   useEffect(() => {
     if (!userToken) return;
@@ -68,6 +68,7 @@ export default function Dashboard() {
 
     if (data.id === user.user_id) {
       setResults([]); // Clear results if the user is searching for themselves
+      setHighlightEdges([]); // Clear highlighted edges
       return;
     }
 
