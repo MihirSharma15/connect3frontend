@@ -43,11 +43,11 @@ const formSchema = z.object({
 import UnauthenticatedRoute from "@/app/(auth)/UnauthenticatedRoute";
 import { Props } from "next/script";
 
-export default async function Login({ params }: Props) {
+export default function Login({ params }: Props) {
   const router = useRouter();
   const [inviteError, setInviteError] = useState<string | null>();
 
-  const { inviteCode } = await params;
+  const { inviteCode } = params;
 
   useEffect(() => {
     if (inviteCode) {
