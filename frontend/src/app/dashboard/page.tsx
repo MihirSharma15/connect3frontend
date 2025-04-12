@@ -6,21 +6,20 @@ import { fetchShortestPathTo, getCurrentUser, fetchUserGraph } from "@/apis/auth
 import { getAuthToken } from "@/utils/authUtils";
 import ProtectedRoute from "@/app/(auth)/ProtectedRoute";
 import ShareDialog from "./components/ShareDialog";
-
-localStorage.theme = 'light';
+import { stringSimilarity } from "string-similarity-js";
+import { set } from "react-hook-form";
 
 export default function Dashboard() {
-  // Search input state
   const [search, setSearch] = useState(""); // User's search query
-  const [highlightEdges, setHighlightEdges] = useState([]); // Search results
+  const [highlightEdges, setHighlightEdges] = useState([]); // Highlighted edges based on query
+  const [results, setResults] = useState<string[]>([]); // Search results
   const [isLoading, setIsLoading] = useState(false); // Loading state
   const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null); // Debounce timer
-  const [user, setUser]  = useState<object>({}); // User's search query
-  const [nodes, setNodes]  = useState<{ name: string, id: string }[]>([]); // User's search query
-  const [edges, setEdges]  = useState<{ source: string, target: string }[]>([]); // User's search query
+  const [user, setUser]  = useState<object>({}); // Current user
+  const [nodes, setNodes]  = useState<{ name: string, id: string }[]>([]); // Nodes in the graph
+  const [edges, setEdges]  = useState<{ source: string, target: string }[]>([]); // Edges in the graph
 
   const userToken : string | undefined = getAuthToken();
-  // Fetch the current user when the component mounts
 
   useEffect(() => {
     if (!userToken) return;
@@ -55,11 +54,22 @@ export default function Dashboard() {
   // Fetch users by name
   const fetchUsers = async (query: string) => {
     if (!query.trim()) {
-      setHighlightEdges([]); // Clear results for empty input
+      setResults([]); // Clear results for empty input
       return;
     }
 
     const data = nodes.find(node => node.name.toLowerCase() === query.toLowerCase());
+
+    if (!data) {
+      const similar = nodes.sort((a, b) => stringSimilarity(query, b.name) - stringSimilarity(query, a.name)).slice(0, 3).map(node => node.name);
+      setResults(similar);
+      return;
+    }
+
+    if (data.id === user.user_id) {
+      setResults([]); // Clear results if the user is searching for themselves
+      return;
+    }
 
     try {
       setIsLoading(true); // Set loading state
@@ -76,7 +86,7 @@ export default function Dashboard() {
     if (search.trim()) {
       fetchUsers(search);
     } else {
-      setHighlightEdges([]); // Clear results for empty input
+      setResults([]); // Clear results for empty input
     }
   }, [search, nodes]); // Re-fetch when search or nodes change
 
@@ -97,8 +107,8 @@ export default function Dashboard() {
   };
 
   // Handle a user selection from the search results
-  const handleSelectUser = (user: any) => {
-    setSearch(user.name); // Set the selected user name in the input field
+  const handleSelectUser = (user: string) => {
+    setSearch(user); // Set the selected user name in the input field
     setResults([]); // Clear the dropdown after selection
   };
 
@@ -117,21 +127,20 @@ export default function Dashboard() {
 
         {/* Dropdown for search results */}
         {isLoading && <div className="mt-2 text-sm text-gray-500">Loading...</div>}
-        {/*!isLoading && results.length > 0 && (
+        {!isLoading && results.length > 0 && (
           <div className="mt-2 bg-white border border-gray-300 rounded shadow">
-            {high.map((user: any) => (
+            {results.map((user: string) => (
               <div
-                key={user.id}
+                key={user}
                 className="p-2 hover:bg-gray-100 cursor-pointer"
                 onClick={() => handleSelectUser(user)}
               >
-                <p>{user.name}</p>
-                <p className="text-sm text-gray-500">{user.phonenumber}</p>
+                <p>{user}</p>
               </div>
             ))}
           </div>
-        )*/}
-        {!isLoading && search.trim() && highlightEdges.length === 0 && (
+        )}
+        {!isLoading && search?.trim() && highlightEdges.length === 0 && search?.trim() !== user.name && (
           <div className="mt-2 text-sm text-red-500">No users found.</div>
         )}
       </div>
