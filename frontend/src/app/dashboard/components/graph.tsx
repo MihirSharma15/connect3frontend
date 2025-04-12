@@ -18,7 +18,7 @@ function ordinal_suffix_of(i) {
   return i + "th";
 }
 
-export default function Graph({ nodes, edges, highlightEdges=[], setQuery }) {
+function Graph({ nodes, edges, highlightEdges=[], setQuery }) {
   const colorScale = d3.scaleLinear()
     .domain([0, d3.max(nodes, (d) => d.degree)])  // Range based on degree 0 to the max degree
     .range(["#88aaee", "#dae4f5"]);  // Lighter shades of #88aaee
@@ -36,6 +36,18 @@ export default function Graph({ nodes, edges, highlightEdges=[], setQuery }) {
 
   const svgRef = useRef(null);
 
+  const simulation = d3
+  .forceSimulation(nodes)
+  .force(
+    "link",
+    d3
+      .forceLink(edges)
+      .id((d) => d.id)
+      .distance(150)
+  )
+  .force("charge", d3.forceManyBody().strength(-200))
+  .force("collision", d3.forceCollide().radius(60));
+
   useEffect(() => {
     const svg = d3.select(svgRef.current);
     const width = window.innerWidth;
@@ -50,26 +62,12 @@ export default function Graph({ nodes, edges, highlightEdges=[], setQuery }) {
 
     svg.call(zoom);
 
-    if (nodes[0]) {
-      //let connections = highlightEdges.connections;
-      //console.log(connections)
-      //let node = connections?.length ? nodes.find(d => d.id === connections[connections.length-1].user_id) || nodes[0] : nodes[0]
-      nodes[0].fx = width / 2;
-      nodes[0].fy = height / 2;
-      nodes[0].fixed = true;
+    let userNode = nodes.find(n => n.degree === 0);
+    if (userNode) {
+      userNode.fx = width / 2;
+      userNode.fy = height / 2;
+      userNode.fixed = true;
     }
-
-    const simulation = d3
-      .forceSimulation(nodes)
-      .force(
-        "link",
-        d3
-          .forceLink(edges)
-          .id((d) => d.id)
-          .distance(150)
-      )
-      .force("charge", d3.forceManyBody().strength(-200))
-      .force("collision", d3.forceCollide().radius(60));
 
     const link = g
       .append("g")
@@ -95,11 +93,11 @@ export default function Graph({ nodes, edges, highlightEdges=[], setQuery }) {
       .attr("class", "node-group")
       .on("click", (event, d) => {
         if (setQuery) {
-          setQuery(d.name); // or setQuery(d.user_id) or any field you prefer
+          setQuery(d.name);
         }
       });
 
-const texts = nodeGroup
+nodeGroup
 .append("text")
 .text((d) => `${d.name}${d.degree ? ` (${ordinal_suffix_of(d.degree)})` : "" }`)
 .attr("text-anchor", "middle")
@@ -108,7 +106,7 @@ const texts = nodeGroup
 .style("font-size", "12px")
 .style("pointer-events", "none"); 
 
-nodeGroup.each(function (d, i) {
+nodeGroup.each(function () {
 const group = d3.select(this);
 const text = group.select("text");
 const bbox = text.node().getBBox();
@@ -136,7 +134,7 @@ group
 
       nodeGroup.attr("transform", (d) => `translate(${d.x},${d.y})`);
     });
-  }, [nodes, edges, highlightEdges, setQuery, colorScale, highlightEdgeSet]);
+  }, [nodes, edges, highlightEdges, setQuery, colorScale, highlightEdgeSet, simulation]);
 
   return (
     <svg
@@ -149,3 +147,5 @@ group
     />
   );
 }
+
+export default React.memo(Graph);
