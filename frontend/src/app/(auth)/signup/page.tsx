@@ -3,10 +3,11 @@
 import React, { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "@/components/hooks/use-toast";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { useFieldArray, useForm } from "react-hook-form";
+import { Controller } from "react-hook-form";
 
 import {
   Card,
@@ -42,7 +43,7 @@ import { useSearchParams } from "next/navigation";
 const PhoneSchema = z.object({
   phonenumber: z
     .string()
-    .regex(/^\+?[1-9]\d{1,14}$/, { message: "Invalid phone number format." })
+    .regex(/^\+?[0-9]\d{1,14}$/, { message: "Invalid phone number format." })
     .length(10, { message: "Phone number must be 10 digits" }),
 });
 
@@ -158,9 +159,8 @@ export default function Signup() {
 
   const handlePhoneSubmit = ({ phonenumber }: { phonenumber: string }) => {
     setPhoneNumber("+1" + phonenumber);
-    setAccessToken("[REDACTED_JWT]"); // TESTING DELETE LATER
-    setStep(3); // TESTING DELETE LATER
-    // sendOTPMutation.mutate(phonenumber); UNCOMMENT LATER
+    sendOTPMutation.mutate("+1" + phonenumber);
+    setStep(2);
   };
 
   const otpForm = useForm({
@@ -219,48 +219,56 @@ export default function Signup() {
       )}
 
       {/* STEP 2: OTP Verification */}
-      {step === 2 && (
-        <Card className="w-full max-w-sm">
-          <CardHeader className="text-center">
-            <CardTitle>Verify OTP</CardTitle>
-            <CardDescription>Enter the OTP sent to your phone</CardDescription>
-          </CardHeader>
-          <CardContent className="text-center">
-            <form onSubmit={otpForm.handleSubmit(handleOTPSubmit)} className="flex flex-col gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="otp" className="text-black">One-Time Password</Label>
-                <div className="flex justify-center">
-                  <InputOTP maxLength={6} {...otpForm.register("pin")}>
-                    <InputOTPGroup>
-                      <InputOTPSlot index={0} />
-                      <InputOTPSlot index={1} />
-                      <InputOTPSlot index={2} />
-                    </InputOTPGroup>
-                    <InputOTPSeparator />
-                    <InputOTPGroup>
-                      <InputOTPSlot index={3} />
-                      <InputOTPSlot index={4} />
-                      <InputOTPSlot index={5} />
-                    </InputOTPGroup>
-                  </InputOTP>
-                </div>
-                <p className="text-red-600 text-sm font-bold">
-                  {otpForm.formState.errors.pin?.message}
-                </p>
-              </div>
-              <CardFooter className="p-0">
-                <Button
-                  type="submit"
-                  className="w-full bg-[#c7d6ef]"
-                  disabled={verifyOTPMutation.isLoading}
-                >
-                  {verifyOTPMutation.isLoading ? "Verifying..." : "Verify"}
-                </Button>
-              </CardFooter>
-            </form>
-          </CardContent>
-        </Card>
-      )}
+{step === 2 && (
+  <Card className="w-full max-w-sm">
+    <CardHeader className="text-center">
+      <CardTitle>Verify OTP</CardTitle>
+      <CardDescription>Enter the OTP sent to your phone</CardDescription>
+    </CardHeader>
+    <CardContent className="text-center">
+      <form onSubmit={otpForm.handleSubmit(handleOTPSubmit)} className="flex flex-col gap-4">
+        <div className="grid gap-2">
+          <Label htmlFor="pin" className="text-black">One-Time Password</Label>
+          <div className="flex justify-center">
+            <Controller
+              control={otpForm.control}
+              name="pin"
+              render={({ field }) => (
+                <InputOTP maxLength={6} {...field}>
+                  <InputOTPGroup>
+                    <InputOTPSlot index={0} />
+                    <InputOTPSlot index={1} />
+                    <InputOTPSlot index={2} />
+                  </InputOTPGroup>
+                  <InputOTPSeparator />
+                  <InputOTPGroup>
+                    <InputOTPSlot index={3} />
+                    <InputOTPSlot index={4} />
+                    <InputOTPSlot index={5} />
+                  </InputOTPGroup>
+                </InputOTP>
+              )}
+            />
+          </div>
+          <p className="text-red-600 text-sm font-bold">
+            {otpForm.formState.errors.pin?.message}
+          </p>
+        </div>
+        <div className="p-0">
+          <Button
+            type="submit"
+            className="w-full bg-[#c7d6ef]"
+            disabled={verifyOTPMutation.isLoading}
+          >
+            {verifyOTPMutation.isLoading ? "Verifying..." : "Verify"}
+          </Button>
+        </div>
+      </form>
+    </CardContent>
+  </Card>
+)}
+
+
 
       {/* STEP 3: Complete Profile */}
       {step === 3 && (

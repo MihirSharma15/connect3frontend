@@ -10,7 +10,7 @@ import ShareButton from "./ShareButton";
 
 export default function ShareDialog({ num_connections, invite_code } : { num_connections: number, invite_code: string }) {
     return (<Dialog open={true} onOpenChange={() => {}}>
-          <DialogContent className="bg-white [&>button]:hidden">
+          <DialogContent className="bg-white [&>button]:hidden text-black">
             <DialogHeader>
                 <DialogTitle>Unlock Your Network</DialogTitle>
               <DialogDescription>
@@ -20,7 +20,7 @@ export default function ShareDialog({ num_connections, invite_code } : { num_con
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <ShareButton title="Join me on Connect3: UNC's First Social Graph!" text="" url={`https://connect3.live/i/${invite_code}`} />
+              <ShareButton title="Join me on Connect3: UNC's First Social Graph!" text="" url={`https://connect3.live/invite/${invite_code}`} />
             </DialogFooter>
           </DialogContent>
           </Dialog>
