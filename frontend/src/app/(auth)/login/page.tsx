@@ -41,13 +41,13 @@ const formSchema = z.object({
     .string()
 });
 import UnauthenticatedRoute from "@/app/(auth)/UnauthenticatedRoute";
+import { Props } from "next/script";
 
-export default function Login() {
+export default async function Login({ params }: Props) {
   const router = useRouter();
-  const [inviteError, setInviteError] = useState<string | null>(null);
+  const [inviteError, setInviteError] = useState<string | null>();
 
-  const searchParams = useSearchParams();
-  const inviteCode = searchParams.get("inviteCode");
+  const { inviteCode } = await params;
 
   useEffect(() => {
     if (inviteCode) {

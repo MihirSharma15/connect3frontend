@@ -1,6 +1,7 @@
 "use server"
 
 import { getAuthTokenServer } from "@/utils/authUtils.server";
+import { UserInDb } from "@/types/UserInDb";
 
 const API_BASE_URL = "https://api.connect3.live";
 
