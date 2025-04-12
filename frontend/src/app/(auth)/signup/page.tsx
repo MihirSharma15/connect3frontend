@@ -38,6 +38,7 @@ import {
 import { setAuthCookie, } from "@/utils/authUtils";
 import UnauthenticatedRoute from "@/app/(auth)/UnauthenticatedRoute";
 import { useSearchParams } from "next/navigation";
+import { Props } from "next/script";
 
 
 const PhoneSchema = z.object({
@@ -67,15 +68,14 @@ const UserDetailsSchema = z.object({
     }),
 });
 
-export default function Signup() {
+export default async function Signup({ params }: Props) {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [phonenumber, setPhoneNumber] = useState("");
   const [accessToken, setAccessToken] = useState("");
-  const [inviteError, setInviteError] = useState<string | null>(null);
+  const [inviteError, setInviteError] = useState<string | null>();
 
-  const searchParams = useSearchParams();
-  const inviteCode = searchParams.get("inviteCode");
+  const { inviteCode } = await params;
 
   useEffect(() => {
     if (inviteCode) {

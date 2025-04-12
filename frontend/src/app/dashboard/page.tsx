@@ -18,7 +18,7 @@ export default function Dashboard() {
   const [nodes, setNodes]  = useState<{ name: string, id: string }[]>([]); // Nodes in the graph
   const [edges, setEdges]  = useState<{ source: string, target: string }[]>([]); // Edges in the graph
 
-  const userToken : string | undefined = getAuthToken(document);
+  const userToken : string | undefined = document ? getAuthToken(document) : undefined;
 
   useEffect(() => {
     if (!userToken) return;
