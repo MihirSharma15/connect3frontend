@@ -46,7 +46,12 @@ function Graph({ nodes, edges, highlightEdges=[], setQuery }) {
       .distance(150)
   )
   .force("charge", d3.forceManyBody().strength(-200))
-  .force("collision", d3.forceCollide().radius(60));
+  .force("collision", d3.forceCollide().radius(d => {
+    const textLength = d.name.length + (d.degree ? 6 : 0); // Rough estimate
+    const charWidth = 6.5; // Adjust based on font size
+    const padding = 10;
+    return (textLength * charWidth) / 2 + padding;
+  }));
 
   useEffect(() => {
     const svg = d3.select(svgRef.current);
