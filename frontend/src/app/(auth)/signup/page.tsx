@@ -189,7 +189,7 @@ export default function Signup() {
         <Card className="w-full max-w-sm">
           <CardHeader className="text-center">
             <CardTitle>Sign Up</CardTitle>
-            <CardDescription>Enter your phone number to get started</CardDescription>
+            <CardDescription>Enter your phone number to get started.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={phoneForm.handleSubmit(handlePhoneSubmit)} className="flex flex-col gap-4">
