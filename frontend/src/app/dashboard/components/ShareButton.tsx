@@ -11,7 +11,7 @@ function ShareButton({ title, text, url }: { title: string, text: string, url: s
         }
       } else {
         try {
-          await navigator.clipboard.writeText(url);
+          if (navigator.clipboard) await navigator.clipboard.writeText(url);
           alert("Invite link copied to clipboard! Send it to 3 of your friends");
         } catch (err) {
           alert("Sharing not supported on this device.");

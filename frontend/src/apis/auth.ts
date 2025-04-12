@@ -283,7 +283,7 @@ export async function connectByInviteCode(code: string) {
     } else {
       detailedErrorMessage = JSON.stringify(errorData);
     }
-    throw new Error(
+    console.error(
       `Error ${response.status} (${response.statusText}): ${detailedErrorMessage}`
     );
   }

@@ -43,7 +43,7 @@ import { useSearchParams } from "next/navigation";
 const PhoneSchema = z.object({
   phonenumber: z
     .string()
-    .regex(/^\+?[1-9]\d{1,14}$/, { message: "Invalid phone number format." })
+    .regex(/^\+?[0-9]\d{1,14}$/, { message: "Invalid phone number format." })
     .length(10, { message: "Phone number must be 10 digits" }),
 });
 
