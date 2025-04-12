@@ -13,7 +13,7 @@ export default function UnauthenticatedRoute({
 
   useEffect(() => {
     const checkAuthentication = async () => {
-      const token = getAuthToken(); 
+      const token = getAuthToken(document); 
       if (!token) {
         return;
       }

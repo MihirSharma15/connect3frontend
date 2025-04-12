@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { toast } from "@/components/hooks/use-toast";
 import React, { useState, useEffect } from "react";
@@ -35,7 +35,7 @@ import { connectByInviteCode, searchUserByInviteCode } from "@/apis/auth";
 const formSchema = z.object({
   phonenumber: z
     .string()
-    .regex(/^\+?[1-9]\d{1,14}$/, { message: "Invalid phone number format." })   
+    .regex(/^\+?[0-9]\d{1,14}$/, { message: "Invalid phone number format." })   
     .length(10, { message: "Phone number must be 10 digits" }), 
   password: z
     .string()
@@ -61,32 +61,33 @@ export default function Login() {
       })();
     }
   }, [inviteCode]);
+
+  const [inviteConnected, setInviteConnected] = useState(false);
+
+useEffect(() => {
+  if (inviteCode && !inviteConnected) {
+    connectByInviteCode(inviteCode)
+      .then(() => {
+        toast({ title: "Connected via Invite" });
+        setInviteConnected(true);
+      })
+      .catch((error) => {
+        console.error("Invite connection error:", error);
+        // Don’t block login if invite fails, but show toast if needed
+      });
+  }
+}, [inviteCode, inviteConnected]);
   
   const loginUserMutation = useMutation({
       mutationFn: loginUser,
       onSuccess: (result) => {
         toast({ title: "User Verified" });
         setAuthCookie(result.access_token);
-        if (inviteCode) {
-          connectMutation.mutate(inviteCode);
-        }
         router.push("/dashboard");
       },
       onError: (error: any) => {
         toast({ title: "Error", description: error.message });
       },
-  });
-
-  // Mutation to connect by invite code
-  const connectMutation = useMutation({
-    mutationFn: (code: string) => connectByInviteCode(code),
-    onSuccess: (data) => {
-      toast({ title: "Connection Created", description: "Your connection has been created successfully." });
-    },
-    onError: (error: any) => {
-      // Display the error. This error text is the same as shown in your invite page.
-      toast({ title: "Error", description: error.message || "Invite Code Expired or Not Valid." });
-    },
   });
 
   const form = useForm({
