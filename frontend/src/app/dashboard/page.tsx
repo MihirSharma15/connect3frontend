@@ -58,7 +58,7 @@ export default function Dashboard() {
     fetchCurrentUser();
   }, [userToken]);
 
-  // Fetch users by name
+  // Fetch users for search
   const fetchUsers = async (query: string) => {
     if (!query.trim()) {
       setResults([]); // Clear results for empty input
