@@ -25,7 +25,7 @@ type InvitePageProps = {
   params: { inviteCode: string };
 };
 
-export default async function InvitePage({ params }: InvitePageProps) {
+export default async function InvitePage({ params }) {
   const { inviteCode } = await params;
   let inviteData: InviteData;
 
