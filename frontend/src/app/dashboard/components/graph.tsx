@@ -43,7 +43,7 @@ function Graph({ nodes, edges, highlightEdges=[], setQuery }) {
     d3
       .forceLink(edges)
       .id((d) => d.id)
-      .distance(150)
+      .distance(160)
   )
   .force("charge", d3.forceManyBody().strength(-200))
   .force("collision", d3.forceCollide().radius(d => {

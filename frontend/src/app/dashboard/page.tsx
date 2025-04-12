@@ -36,7 +36,7 @@ export default function Dashboard() {
         setUser(user);
 
         try {
-          let { nodes, edges } = await fetchUserGraph(user.remaining_connections > 0 ? 1 : 5, userToken);
+          let { nodes, edges } = await fetchUserGraph(user.remaining_connections > 0 ? 1 : 6, userToken);
           console.log(nodes)
           if (user.remaining_connections > 0) {
             //Add blank nodes with ? in them
@@ -154,7 +154,9 @@ export default function Dashboard() {
       </div>
 
       {/* Graph Component */}
-      <Graph nodes={nodes} edges={edges} setQuery={setSearch} highlightEdges={highlightEdges} />
+      {!edges.length ? (<div className="flex items-center justify-center h-screen">
+          <p className="text-center text-4xl">Loading . . .</p>
+        </div>) : (<Graph nodes={nodes} edges={edges} setQuery={setSearch} highlightEdges={highlightEdges} />) }
 
       {user.remaining_connections > 0 && (<ShareDialog num_connections={3-user.remaining_connections} invite_code={user.invite_code}/>)}
     </div>
