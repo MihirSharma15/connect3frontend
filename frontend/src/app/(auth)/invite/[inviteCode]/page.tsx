@@ -12,13 +12,12 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 
 type InviteData = {
   user_id: string;
   name: string;
-  phonenumber?: string;
-  degree?: number;
+  remaining_connections: number;
 };
 
 type InvitePageProps = {
@@ -26,7 +25,7 @@ type InvitePageProps = {
 };
 
 export default async function InvitePage({ params }: InvitePageProps) {
-  const { inviteCode } = params;
+  const { inviteCode } = await params;
   let inviteData: InviteData;
 
   try {
@@ -62,12 +61,11 @@ export default async function InvitePage({ params }: InvitePageProps) {
         <CardHeader className="p-0 mb-8">
           <Card className="bg-[#c7d6ef] flex items-center gap-6 px-8 py-6 border-b-2 border-black rounded-sm">
             <div className="w-14 h-14 border-2 border-black rounded-full bg-white flex items-center justify-center">
-              {/* Placeholder Avatar (replace with your own image/icon if desired) */}
-              <span className="text-2xl">👤</span>
+              <span className="text-2xl block leading-[1] w-14 text-center">👤</span>
             </div>
             <div>
-              <p className="text-xl font-bold">{inviteData.name}</p>
-              <p className="mt-1 text-base">has invited you to Connect3</p>
+              <p className="text-xl font-bold">{inviteData.remaining_connections > 0 ? inviteData.name : "Invalid Invite"}</p>
+              <p className="mt-1 text-base">{inviteData.remaining_connections > 0 ? "has invited you to Connect3" : `${inviteData.name} has invited you to Connect3, but they have no remaining connections`}</p>
             </div>
           </Card>
         </CardHeader>
@@ -75,12 +73,12 @@ export default async function InvitePage({ params }: InvitePageProps) {
         {/* Main Card Content */}
         <CardContent className="p-0 mb-8">
           <div className="space-y-8">
-          <Link href={`/signup?inviteCode=${inviteCode}`} passHref>
+          <Link href={inviteData.remaining_connections > 0 ? `/signup?inviteCode=${inviteCode}` : "/signup"} passHref>
             <Button
               type="button"
               className="w-full bg-customBlue"
             >
-              Sign Up to Connect →
+              Sign Up {inviteData.remaining_connections > 0 ? "to Connect" : "Anyways"} →
             </Button>
             </Link>
             <hr className="border-black" />
