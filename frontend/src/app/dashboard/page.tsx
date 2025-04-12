@@ -36,10 +36,10 @@ export default function Dashboard() {
         setUser(user);
 
         try {
-          let { nodes, edges } = await fetchUserGraph(false && user.remaining_connections > 0 ? 1 : 4, userToken);
-          if (false && user.remaining_connections > 0) {
+          let { nodes, edges } = await fetchUserGraph(user.remaining_connections > 0 ? 1 : 4, userToken);
+          if (user.remaining_connections > 0) {
             //Add blank nodes with ? in them
-            for (let i = 0; i < false && user.remaining_connections; i++) {
+            for (let i = 0; i < user.remaining_connections; i++) {
               nodes.push({ name: "?", user_id: `blank${i}` });
               edges.push({ source: `blank${i}`, target: user.user_id });
             }
@@ -155,7 +155,7 @@ export default function Dashboard() {
       {/* Graph Component */}
       <Graph nodes={nodes} edges={edges} setQuery={setSearch} highlightEdges={highlightEdges} />
 
-      {false && user.remaining_connections > 0 && (<ShareDialog num_connections={3-false && user.remaining_connections} invite_code={user.invite_code}/>)}
+      {user.remaining_connections > 0 && (<ShareDialog num_connections={3-user.remaining_connections} invite_code={user.invite_code}/>)}
     </div>
     </ProtectedRoute>
   );
