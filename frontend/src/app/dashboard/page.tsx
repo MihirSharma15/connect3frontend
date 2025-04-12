@@ -17,8 +17,15 @@ export default function Dashboard() {
   const [user, setUser]  = useState<object>({}); // Current user
   const [nodes, setNodes]  = useState<{ name: string, id: string }[]>([]); // Nodes in the graph
   const [edges, setEdges]  = useState<{ source: string, target: string }[]>([]); // Edges in the graph
+  const [userToken, setUserToken] = useState<string | undefined>(undefined); // Auth token
 
-  const userToken : string | undefined = document ? getAuthToken(document) : undefined;
+  // Set userToken after component mounts on the client
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      const token = getAuthToken(document);
+      setUserToken(token);
+    }
+  }, []);
 
   useEffect(() => {
     if (!userToken) return;

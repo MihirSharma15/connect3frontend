@@ -68,14 +68,14 @@ const UserDetailsSchema = z.object({
     }),
 });
 
-export default async function Signup({ params }: Props) {
+export default function Signup({ params }: Props) {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [phonenumber, setPhoneNumber] = useState("");
   const [accessToken, setAccessToken] = useState("");
   const [inviteError, setInviteError] = useState<string | null>();
 
-  const { inviteCode } = await params;
+  const { inviteCode } = params;
 
   useEffect(() => {
     if (inviteCode) {

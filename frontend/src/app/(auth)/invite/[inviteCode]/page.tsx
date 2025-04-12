@@ -32,7 +32,6 @@ export default async function InvitePage({ params }: Props) {
 
   let loggedInUser = await getAuthTokenServer();
 
-  console.log(loggedInUser)
   try {
     inviteData = await searchUserByInviteCode(inviteCode);
   } catch (error: any) {
