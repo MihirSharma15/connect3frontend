@@ -1,4 +1,5 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import ShareButton from "./ShareButton";
 import { useState } from "react";
 
@@ -6,6 +7,10 @@ export default function ShareDialog({ num_connections, invite_code } : { num_con
     const [open, setOpen] = useState(true);
 
     return (<Dialog open={open} onOpenChange={setOpen}>
+        <div className="fixed bottom-4 right-4 z-50">
+        <DialogTrigger asChild>
+            <Button>Invite Friends</Button>
+            </DialogTrigger></div>
           <DialogContent className="bg-white text-black"
           >
             <DialogHeader>
