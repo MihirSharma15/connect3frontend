@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
+import { Lock } from "lucide-react";
 
 function ordinal_suffix_of(i) {
   let j = i % 10,
@@ -18,7 +19,7 @@ function ordinal_suffix_of(i) {
   return i + "th";
 }
 
-function Graph({ nodes, edges, highlightEdges=[], setQuery }) {
+function Graph({ nodes, edges, highlightEdges=[], setQuery, obscure }) {
   const colorScale = d3.scaleLinear()
     .domain([0, d3.max(nodes, (d) => d.degree)])  // Range based on degree 0 to the max degree
     .range(["#88aaee", "#dae4f5"]);  // Lighter shades of #88aaee
@@ -97,19 +98,72 @@ function Graph({ nodes, edges, highlightEdges=[], setQuery }) {
       .append("g")
       .attr("class", "node-group")
       .on("click", (event, d) => {
-        if (setQuery) {
+        if ((!obscure || d.degree <= 2) && setQuery) {
           setQuery(d.name);
         }
       });
 
+      nodeGroup
+      .append("text")
+      .text((d) =>
+        obscure && d.degree > 2 ? "" : `${d.name}${d.degree ? ` (${ordinal_suffix_of(d.degree)})` : ""}`
+      )
+      .attr("text-anchor", "middle")
+      .attr("dy", 5)
+      .style("font-weight", "bold")
+      .style("font-size", "12px")
+      .style("pointer-events", "none");
+    
+
+      const padding = 10;
+const lockSize = 20;
+const boxSize = lockSize + padding * 2;
+
 nodeGroup
-.append("text")
-.text((d) => `${d.name}${d.degree ? ` (${ordinal_suffix_of(d.degree)})` : "" }`)
-.attr("text-anchor", "middle")
-.attr("dy", 5)
-.style("font-weight", "bold")
-.style("font-size", "12px")
-.style("pointer-events", "none"); 
+  .filter(d => obscure && d.degree > 2)
+  .each(function (d) {
+    const group = d3.select(this);
+
+    group
+      .append("rect")
+      .attr("x", -boxSize / 2)
+      .attr("y", -boxSize / 2)
+      .attr("width", boxSize)
+      .attr("height", boxSize)
+      .attr("rx", 6)
+      .attr("fill", "#d1d1d1")
+      .attr("stroke", "#000")
+      .attr("stroke-width", 2)
+      .attr("filter", "drop-shadow(4px 4px 0px black)");
+
+    const svg = group
+      .append("svg")
+      .attr("x", -lockSize / 2)
+      .attr("y", -lockSize / 2)
+      .attr("width", lockSize)
+      .attr("height", lockSize)
+      .attr("viewBox", "0 0 24 24");
+
+    svg.append("path")
+      .attr("d", "M7 11V7a5 5 0 0 1 10 0v4")
+      .attr("stroke", "black")
+      .attr("stroke-width", 2)
+      .attr("fill", "none")
+      .attr("stroke-linecap", "round")
+      .attr("stroke-linejoin", "round");
+
+    svg.append("rect")
+      .attr("x", 3)
+      .attr("y", 11)
+      .attr("width", 18)
+      .attr("height", 11)
+      .attr("rx", 2)
+      .attr("ry", 2)
+      .attr("stroke", "black")
+      .attr("stroke-width", 2)
+      .attr("fill", "none");
+  });
+
 
 nodeGroup.each(function () {
 const group = d3.select(this);
@@ -124,7 +178,7 @@ group
   .attr("width", bbox.width + padding * 2)
   .attr("height", bbox.height + padding * 2)
   .attr("rx", 6)
-  .attr("fill", (d) => highlightEdgeSet.find(c => c.startsWith(d.id) || c.endsWith(d.id)) ? ("#6ed8ff") : (colorScale(d.degree) || "#fff"))
+  .attr("fill", (d) => obscure && d.degree > 2 ? "#d1d1d1" : (highlightEdgeSet.find(c => c.startsWith(d.id) || c.endsWith(d.id)) ? ("#6ed8ff") : (colorScale(d.degree) || "#fff")))
   .attr("stroke", "#000")
   .attr("stroke-width", 2)
   .attr("filter", "drop-shadow(4px 4px 0px black)");

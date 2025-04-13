@@ -1,20 +1,22 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle
-} from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import ShareButton from "./ShareButton";
+import { useState } from "react";
 
 export default function ShareDialog({ num_connections, invite_code } : { num_connections: number, invite_code: string }) {
-    return (<Dialog open={true} onOpenChange={() => {}}>
-          <DialogContent className="bg-white [&>button]:hidden text-black">
+    const [open, setOpen] = useState(true);
+
+    return (<Dialog open={open} onOpenChange={setOpen}>
+        <div className="fixed bottom-4 right-4 z-50">
+        <DialogTrigger asChild>
+            <Button>Invite Friends</Button>
+            </DialogTrigger></div>
+          <DialogContent className="bg-white text-black"
+          >
             <DialogHeader>
                 <DialogTitle>Unlock Your Network</DialogTitle>
               <DialogDescription>
-                You must have 3 connections to unlock the graph. Share your invite with your friends, and once they join you'll be able to see your network!
+                You must have 3 connections to unlock the full graph. Share your invite with your friends, and once they join you'll be able to see your network!
                 <br /><br />
                 You have invited <strong>{num_connections}/3</strong> connections.
               </DialogDescription>
