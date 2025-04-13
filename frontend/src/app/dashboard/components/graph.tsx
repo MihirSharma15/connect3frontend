@@ -18,7 +18,7 @@ function ordinal_suffix_of(i) {
   return i + "th";
 }
 
-function Graph({ nodes, edges, highlightEdges=[], setQuery }) {
+function Graph({ nodes, edges, highlightEdges=[], setQuery, obscure }) {
   const colorScale = d3.scaleLinear()
     .domain([0, d3.max(nodes, (d) => d.degree)])  // Range based on degree 0 to the max degree
     .range(["#88aaee", "#dae4f5"]);  // Lighter shades of #88aaee
@@ -97,14 +97,14 @@ function Graph({ nodes, edges, highlightEdges=[], setQuery }) {
       .append("g")
       .attr("class", "node-group")
       .on("click", (event, d) => {
-        if (setQuery) {
+        if ((!obscure || d.degree <= 2) && setQuery) {
           setQuery(d.name);
         }
       });
 
 nodeGroup
 .append("text")
-.text((d) => `${d.name}${d.degree ? ` (${ordinal_suffix_of(d.degree)})` : "" }`)
+.text((d) => obscure && d.degree > 2 ? `🔒` : `${d.name}${d.degree ? ` (${ordinal_suffix_of(d.degree)})` : "" }`)
 .attr("text-anchor", "middle")
 .attr("dy", 5)
 .style("font-weight", "bold")
@@ -124,7 +124,7 @@ group
   .attr("width", bbox.width + padding * 2)
   .attr("height", bbox.height + padding * 2)
   .attr("rx", 6)
-  .attr("fill", (d) => highlightEdgeSet.find(c => c.startsWith(d.id) || c.endsWith(d.id)) ? ("#6ed8ff") : (colorScale(d.degree) || "#fff"))
+  .attr("fill", (d) => obscure && d.degree > 2 ? "#383838" : (highlightEdgeSet.find(c => c.startsWith(d.id) || c.endsWith(d.id)) ? ("#6ed8ff") : (colorScale(d.degree) || "#fff")))
   .attr("stroke", "#000")
   .attr("stroke-width", 2)
   .attr("filter", "drop-shadow(4px 4px 0px black)");
