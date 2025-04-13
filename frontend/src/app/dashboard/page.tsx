@@ -7,6 +7,7 @@ import { getAuthToken } from "@/utils/authUtils";
 import ProtectedRoute from "@/app/(auth)/ProtectedRoute";
 import ShareDialog from "./components/ShareDialog";
 import { stringSimilarity } from "string-similarity-js";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function Dashboard() {
   const [search, setSearch] = useState(""); // User's search query
@@ -155,7 +156,7 @@ export default function Dashboard() {
 
       {/* Graph Component */}
       {!edges.length ? (<div className="flex items-center justify-center h-screen">
-          <p className="text-center text-4xl">Loading . . .</p>
+          <Spinner>Loading your social network.</Spinner>
         </div>) : (<Graph nodes={nodes} edges={edges} setQuery={setSearch} highlightEdges={highlightEdges} />) }
 
       {user.remaining_connections > 0 && (<ShareDialog num_connections={3-user.remaining_connections} invite_code={user.invite_code}/>)}
