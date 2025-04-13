@@ -16,7 +16,7 @@ export default function ShareDialog({ num_connections, invite_code } : { num_con
             <DialogHeader>
                 <DialogTitle>Unlock Your Network</DialogTitle>
               <DialogDescription>
-                You must have 3 connections to unlock full the graph. Share your invite with your friends, and once they join you'll be able to see your network!
+                You must have 3 connections to unlock the full graph. Share your invite with your friends, and once they join you'll be able to see your network!
                 <br /><br />
                 You have invited <strong>{num_connections}/3</strong> connections.
               </DialogDescription>
