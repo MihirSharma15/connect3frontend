@@ -37,7 +37,7 @@ export default function Dashboard() {
         setUser(user);
 
         try {
-          let { nodes, edges } = await fetchUserGraph(user.remaining_connections > 0 ? 1 : 5, userToken);
+          let { nodes, edges } = await fetchUserGraph(user.remaining_connections > 0 ? 3 : 5, userToken);
           console.log(nodes)
           if (user.remaining_connections > 0) {
             //Add blank nodes with ? in them
@@ -69,7 +69,8 @@ export default function Dashboard() {
     const data = nodes.find(node => node.name.toLowerCase() === query.toLowerCase());
 
     if (!data) {
-      const similar = nodes.sort((a, b) => stringSimilarity(query, b.name) - stringSimilarity(query, a.name)).slice(0, 3).map(node => node.name);
+      const similarNodeSearch = user.remaining_connections > 0 ? nodes.filter(node => node.degree <= 2) : nodes;
+      const similar = similarNodeSearch.sort((a, b) => stringSimilarity(query, b.name) - stringSimilarity(query, a.name)).slice(0, 3).map(node => node.name);
       setResults(similar);
       return;
     }
@@ -157,7 +158,7 @@ export default function Dashboard() {
       {/* Graph Component */}
       {!edges.length ? (<div className="flex items-center justify-center h-screen">
           <Spinner>Loading your social network.</Spinner>
-        </div>) : (<Graph nodes={nodes} edges={edges} setQuery={setSearch} highlightEdges={highlightEdges} />) }
+        </div>) : (<Graph nodes={nodes} edges={edges} setQuery={setSearch} highlightEdges={highlightEdges} obscure={user.remaining_connections > 0} />) }
 
       {user.remaining_connections > 0 && (<ShareDialog num_connections={3-user.remaining_connections} invite_code={user.invite_code}/>)}
     </div>
