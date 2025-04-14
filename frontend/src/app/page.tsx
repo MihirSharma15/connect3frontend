@@ -106,19 +106,19 @@ export default function Home() {
             <AccordionItem value="item-1">
               <AccordionTrigger>What is Connect3?</AccordionTrigger>
               <AccordionContent>
-                Connect3 is a social venture by UNC students. 
+                Connect3 is a social venture by UNC students. We are trying to map the entire UNC community and visualize it. Essentially see <span className="font-bold">who knows who</span>.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-2">
               <AccordionTrigger>How do I connect with friends?</AccordionTrigger>
               <AccordionContent>
-                Once you sign up, you'll be given a unique code to share with your friends. All three of your connections must sign up before you can explore the network.
+                Once you sign up, you'll be given a unique code to share with your friends. From there, you can connect to up to 3 friends by sharing an invite code. You, however, can accept any number of invite codes sent you to.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-3">
-              <AccordionTrigger>What is the UNC community visualization?</AccordionTrigger>
+              <AccordionTrigger>Is there any cost?</AccordionTrigger>
               <AccordionContent>
-                It's a visual representation of the entire UNC community.
+                Nope! This is a social venture by students for students. We are not charging anything for this.
               </AccordionContent>
             </AccordionItem>
           </Accordion>
