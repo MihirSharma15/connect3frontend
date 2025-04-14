@@ -3,14 +3,22 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
   Sheet,
-  SheetClose,
   SheetContent,
-  SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+
 import { useState } from "react";
 import StatusUpdate from "@/types/StatusUpdate";
 import StatusCard from "./StatusCard";
@@ -18,6 +26,7 @@ import { ScrollArea } from "@radix-ui/react-scroll-area";
 
 export default function StatusSheet({ status_updates, last_read_at } : { status_updates: StatusUpdate[], last_read_at: Date }) {
     const [userStatus, setUserStatus] = useState("");
+    const [shareDistance, setShareDistance] = useState("5");
 
     const setStatusDisabled = !userStatus;
 
@@ -29,7 +38,9 @@ export default function StatusSheet({ status_updates, last_read_at } : { status_
     return (<Sheet>
         <div className="fixed bottom-4 right-4 z-50">
   <SheetTrigger asChild>
-    <Button>Status</Button>
+    <div>
+    <Button>Status {(<div className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-white animate-pulse" />)}</Button>
+    </div>
   </SheetTrigger>
   </div>
   <SheetContent className="bg-white text-black pl-5 pr-5 flex flex-col h-full" side="right">
@@ -48,7 +59,29 @@ export default function StatusSheet({ status_updates, last_read_at } : { status_
     <hr />
     <Label htmlFor="sheet-status-input">Set Your Status <span className="text-xs">(disappears after 24h)</span></Label>
         <Input id="sheet-status-input" defaultValue={userStatus} placeholder="Your Status" onChange={(e) => setUserStatus(e.target.value)} />
-        <Button disabled={setStatusDisabled} type="submit">Set status</Button>
+        <div className="flex flex-row gap-2">
+        <Button className="flex-1" disabled={setStatusDisabled} type="submit">Share status</Button>
+        <Select
+            value={shareDistance}
+            onValueChange={(value) => {
+                setShareDistance(value);
+            }}
+        >
+  <SelectTrigger className="w-20 mt-0.5">
+    <SelectValue placeholder="Select" />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectGroup>
+      <SelectLabel>Share to degree...</SelectLabel>
+      <SelectItem value="1">1st</SelectItem>
+      <SelectItem value="2">2nd</SelectItem>
+      <SelectItem value="3">3rd</SelectItem>
+      <SelectItem value="4">4th</SelectItem>
+      <SelectItem value="5">5th</SelectItem>
+    </SelectGroup>
+  </SelectContent>
+</Select>
+        </div>
       {/* When status set, add to top of network statuses */}
     </SheetFooter>
   </SheetContent>
