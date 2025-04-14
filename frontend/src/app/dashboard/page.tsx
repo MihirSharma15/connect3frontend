@@ -17,7 +17,7 @@ const FAKE_STATUS_UPDATES : StatusUpdate[] = [
     name: "Lucas Moore",
     degree: 3,
     status: "Taking a quick break—back soon!",
-    status_created_at: new Date(Date.now() - 1000 * 60 * 45), // 45 minutes ago
+    status_created_at: new Date(2014, 1, 1), // 45 minutes ago
     status_expires_at: new Date(Date.now() + 1000 * 60 * 15), // 15 minutes from now
   },
   {
@@ -200,7 +200,7 @@ export default function Dashboard() {
         </div>) : (<Graph nodes={nodes} edges={edges} setQuery={setSearch} highlightEdges={highlightEdges} obscure={user.remaining_connections > 0} />) }
 
       {user.remaining_connections > 0 && (<ShareDialog num_connections={3-user.remaining_connections} invite_code={user.invite_code}/>)}
-      <StatusSheet status_updates={nodesWithStatuses.length ? nodesWithStatuses : FAKE_STATUS_UPDATES} last_read_at={new Date()} />
+      {edges.length && (<StatusSheet status_updates={nodesWithStatuses.length ? nodesWithStatuses : FAKE_STATUS_UPDATES} last_read_at={new Date(2015, 0, 1)} />)}
     </div>
     </ProtectedRoute>
   );
