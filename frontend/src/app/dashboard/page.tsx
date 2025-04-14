@@ -8,6 +8,43 @@ import ProtectedRoute from "@/app/(auth)/ProtectedRoute";
 import ShareDialog from "./components/ShareDialog";
 import { stringSimilarity } from "string-similarity-js";
 import { Spinner } from "@/components/ui/spinner";
+import StatusSheet from "./components/StatusSheet";
+import StatusUpdate from "@/types/StatusUpdate";
+
+const FAKE_STATUS_UPDATES : StatusUpdate[] = [
+  {
+    user_id: "725edcba-973a-448b-a3c8-ea2ecfa537f4",
+    name: "Lucas Moore",
+    degree: 3,
+    status: "Taking a quick break—back soon!",
+    status_created_at: new Date(Date.now() - 1000 * 60 * 45), // 45 minutes ago
+    status_expires_at: new Date(Date.now() + 1000 * 60 * 15), // 15 minutes from now
+  },
+  {
+    user_id: "725edcba-973a-448b-a3c8-ea2ecfa537f4",
+    name: "Riley Tran",
+    degree: 5,
+    status: "Wrapping up some emails—ping me if urgent.",
+    status_created_at: new Date(Date.now() - 1000 * 60 * 90), // 1.5 hours ago
+    status_expires_at: new Date(Date.now() + 1000 * 60 * 30), // 30 minutes from now
+  },
+  {
+    user_id: "725edcba-973a-448b-a3c8-ea2ecfa537f4",
+    name: "Avery Chen",
+    degree: 2,
+    status: "On a call—will check messages after.",
+    status_created_at: new Date(Date.now() - 1000 * 60 * 20), // 20 minutes ago
+    status_expires_at: new Date(Date.now() + 1000 * 60 * 40), // 40 minutes from now
+  },
+  {
+    user_id: "725edcba-973a-448b-a3c8-ea2ecfa537f4",
+    name: "Jordan Ellis",
+    degree: 4,
+    status: "Heads down finishing up the report 📄",
+    status_created_at: new Date(Date.now() - 1000 * 60 * 120), // 2 hours ago
+    status_expires_at: new Date(Date.now() + 1000 * 60 * 10), // 10 minutes from now
+  },
+];
 
 export default function Dashboard() {
   const [search, setSearch] = useState(""); // User's search query
@@ -122,6 +159,8 @@ export default function Dashboard() {
     setResults([]); // Clear the dropdown after selection
   };
 
+  const nodesWithStatuses = nodes.map(node => node.status);
+
   return (
     <ProtectedRoute>
     <div className="relative w-screen h-screen">
@@ -161,6 +200,7 @@ export default function Dashboard() {
         </div>) : (<Graph nodes={nodes} edges={edges} setQuery={setSearch} highlightEdges={highlightEdges} obscure={user.remaining_connections > 0} />) }
 
       {user.remaining_connections > 0 && (<ShareDialog num_connections={3-user.remaining_connections} invite_code={user.invite_code}/>)}
+      <StatusSheet status_updates={nodesWithStatuses.length ? nodesWithStatuses : FAKE_STATUS_UPDATES} last_read_at={new Date()} />
     </div>
     </ProtectedRoute>
   );

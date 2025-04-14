@@ -2,22 +2,7 @@
 
 import React, { useEffect, useRef } from "react";
 import * as d3 from "d3";
-import { Lock } from "lucide-react";
-
-function ordinal_suffix_of(i) {
-  let j = i % 10,
-      k = i % 100;
-  if (j === 1 && k !== 11) {
-      return i + "st";
-  }
-  if (j === 2 && k !== 12) {
-      return i + "nd";
-  }
-  if (j === 3 && k !== 13) {
-      return i + "rd";
-  }
-  return i + "th";
-}
+import ordinalSuffixOf from "@/utils/ordinalSuffixOf";
 
 function Graph({ nodes, edges, highlightEdges=[], setQuery, obscure }) {
   const colorScale = d3.scaleLinear()
@@ -106,7 +91,7 @@ function Graph({ nodes, edges, highlightEdges=[], setQuery, obscure }) {
       nodeGroup
       .append("text")
       .text((d) =>
-        obscure && d.degree > 2 ? "" : `${d.name}${d.degree ? ` (${ordinal_suffix_of(d.degree)})` : ""}`
+        obscure && d.degree > 2 ? "" : `${d.name}${d.degree ? ` (${ordinalSuffixOf(d.degree)})` : ""}`
       )
       .attr("text-anchor", "middle")
       .attr("dy", 5)

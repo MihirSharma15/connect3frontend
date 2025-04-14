@@ -1946,6 +1946,11 @@ hasown@^2.0.0, hasown@^2.0.2:
   dependencies:
     function-bind "^1.1.2"
 
+humanize-duration-ts@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.npmjs.org/humanize-duration-ts/-/humanize-duration-ts-2.1.1.tgz"
+  integrity sha512-TibNF2/fkypjAfHdGpWL/dmWUS0G6Qi+3mKyiB6LDCowbMy+PtzbgPTnFMNTOVAJXDau01jYrJ3tFoz5AJSqhA==
+
 iconv-lite@0.6:
   version "0.6.3"
   resolved "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.6.3.tgz"
