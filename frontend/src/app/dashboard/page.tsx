@@ -159,7 +159,7 @@ export default function Dashboard() {
     setResults([]); // Clear the dropdown after selection
   };
 
-  const nodesWithStatuses = nodes.map(node => node.status);
+  const nodesWithStatuses = nodes.filter(node => node.status);
 
   return (
     <ProtectedRoute>
