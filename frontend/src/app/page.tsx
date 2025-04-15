@@ -112,7 +112,7 @@ export default function Home() {
             <AccordionItem value="item-2">
               <AccordionTrigger>How do I connect with friends?</AccordionTrigger>
               <AccordionContent>
-                Once you sign up, you'll be given a unique code to share with your friends. From there, you can connect to up to 3 friends by sharing an invite code. You, however, can accept any number of invite codes sent you to.
+                Once you sign up, you&apos;ll be given a unique code to share with your friends. From there, you can connect to up to 3 friends by sharing an invite code. You, however, can accept any number of invite codes sent you to.
               </AccordionContent>
             </AccordionItem>
             <AccordionItem value="item-3">

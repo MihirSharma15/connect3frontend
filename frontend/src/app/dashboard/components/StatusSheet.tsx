@@ -23,10 +23,11 @@ import { useState } from "react";
 import StatusUpdate from "@/types/StatusUpdate";
 import StatusCard from "./StatusCard";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
+import humanizer from "@/utils/humanizeDuration"
 
-export default function StatusSheet({ status_updates, last_read_at } : { status_updates: StatusUpdate[], last_read_at: Date }) {
-    const [userStatus, setUserStatus] = useState("");
-    const [shareDistance, setShareDistance] = useState("5");
+export default function StatusSheet({ status_updates, last_read_at, user_status, user_status_degree, user_status_expires_at } : { status_updates: StatusUpdate[], last_read_at: Date,  user_status: string | undefined, user_status_degree: number | undefined, user_status_expires_at: Date | undefined }) {
+    const [userStatus, setUserStatus] = useState(user_status || "");
+    const [shareDistance, setShareDistance] = useState(user_status_degree?.toString() || "5");
 
     const setStatusDisabled = !userStatus;
 
@@ -57,12 +58,13 @@ export default function StatusSheet({ status_updates, last_read_at } : { status_
     
     <SheetFooter className="pt-0">
     <hr />
-    <Label htmlFor="sheet-status-input">Set Your Status <span className="text-xs">(disappears after 24h)</span></Label>
-        <Input id="sheet-status-input" defaultValue={userStatus} placeholder="Your Status" onChange={(e) => setUserStatus(e.target.value)} />
+    <Label htmlFor="sheet-status-input">{user_status ? "" : "Set "}Your Status <span className="text-xs">(disappears {user_status_expires_at ? `in ${humanizer.humanize(user_status_expires_at.getTime() - Date.now(), { language: "shortEn", units: ["h", "m", "s"], round: true, largest: 1, spacer: "" })}` : "after 24h"})</span></Label>
+        <Input id="sheet-status-input" defaultValue={userStatus} placeholder="Your Status" disabled={!!user_status} onChange={(e) => setUserStatus(e.target.value)} />
         <div className="flex flex-row gap-2">
-        <Button className="flex-1" disabled={setStatusDisabled} type="submit">Share status</Button>
+        <Button className="flex-1" disabled={setStatusDisabled} type="submit">{user_status ? "Clear" : "Share"} status</Button>
         <Select
             value={shareDistance}
+            disabled={!!user_status}
             onValueChange={(value) => {
                 setShareDistance(value);
             }}
