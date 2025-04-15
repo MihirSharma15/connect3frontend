@@ -3,6 +3,7 @@ type StatusUpdate = {
     name: string,
     degree: number,
     status: string,
+    status_degree: number,
     status_created_at: Date,
     status_expires_at: Date,
 }
