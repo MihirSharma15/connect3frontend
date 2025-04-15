@@ -19,28 +19,35 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import StatusUpdate from "@/types/StatusUpdate";
 import StatusCard from "./StatusCard";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import humanizer from "@/utils/humanizeDuration"
+import { setReadCookie } from "@/utils/readUtils"
 
-export default function StatusSheet({ status_updates, last_read_at, user_status, user_status_degree, user_status_expires_at } : { status_updates: StatusUpdate[], last_read_at: Date,  user_status: string | undefined, user_status_degree: number | undefined, user_status_expires_at: Date | undefined }) {
+export default function StatusSheet({ status_updates, last_read_at, user_status, user_status_degree, user_status_expires_at } : { status_updates: StatusUpdate[], last_read_at: string,  user_status: string | undefined, user_status_degree: number | undefined, user_status_expires_at: Date | undefined }) {
     const [userStatus, setUserStatus] = useState(user_status || "");
     const [shareDistance, setShareDistance] = useState(user_status_degree?.toString() || "5");
 
     const setStatusDisabled = !userStatus;
+    const [removeUnreads, setRemoveUnreads] = useState(false);
 
     const handleStatusUpdate = () => {
       //Handle the request of adding the status to the DB
       //Then update the status_updates to show the new status
     };
 
-    return (<Sheet>
+    const updateLastRead = (open: boolean) => {
+      if (open && document) setReadCookie(document);
+      if (!open) setRemoveUnreads(true);
+    }
+
+    return (<Sheet onOpenChange={updateLastRead}>
         <div className="fixed bottom-4 right-4 z-50">
   <SheetTrigger asChild>
     <div>
-    <Button>Status {(<div className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-white animate-pulse" />)}</Button>
+    <Button>For You {(<div className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-white animate-pulse" />)}</Button>
     </div>
   </SheetTrigger>
   </div>
@@ -51,7 +58,7 @@ export default function StatusSheet({ status_updates, last_read_at, user_status,
     <ScrollArea className="flex-1 overflow-auto">
     {status_updates.map((status_update, index) => (
       <div key={index} className="mb-4">
-        <StatusCard status_update={status_update} last_read_at={last_read_at} />
+        <StatusCard status_update={status_update} last_read_at={removeUnreads ? Date.now().toString()+100 : last_read_at} />
       </div>
     ))}
     </ScrollArea>

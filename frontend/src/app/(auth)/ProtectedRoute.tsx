@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getAuthToken, removeAuthCookie } from "@/utils/authUtils";
+import { getAuthToken } from "@/utils/authUtils";
 
 export default function ProtectedRoute({
   children,

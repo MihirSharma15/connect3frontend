@@ -257,8 +257,6 @@ export async function fetchShortestPathTo(user: string, token: string) {
 }
 export async function connectByInviteCode(code: string) {
   const token = await getAuthTokenServer();
-  console.log("Connecting by token:", token);
-  console.log(token);
   const response = await fetch(`${API_BASE_URL}/users/connect-by-code`, {
     method: "POST",
     headers: {

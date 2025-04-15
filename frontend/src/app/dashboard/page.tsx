@@ -10,6 +10,8 @@ import { stringSimilarity } from "string-similarity-js";
 import { Spinner } from "@/components/ui/spinner";
 import StatusSheet from "./components/StatusSheet";
 import StatusUpdate from "@/types/StatusUpdate";
+import { getReadCookie } from "@/utils/readUtils";
+import { get } from "http";
 
 const FAKE_STATUS_UPDATES : StatusUpdate[] = [
   {
@@ -17,7 +19,7 @@ const FAKE_STATUS_UPDATES : StatusUpdate[] = [
     name: "Lucas Moore",
     degree: 3,
     status: "Taking a quick break—back soon!",
-    status_created_at: new Date(2014, 1, 1), // 45 minutes ago
+    status_created_at: new Date(), // 45 minutes ago
     status_expires_at: new Date(Date.now() + 1000 * 60 * 15), // 15 minutes from now
   },
   {
@@ -57,10 +59,13 @@ export default function Dashboard() {
   const [edges, setEdges]  = useState<{ source: string, target: string }[]>([]); // Edges in the graph
   const [userToken, setUserToken] = useState<string | undefined>(undefined); // Auth token
 
+  const lastReadAt = React.useRef("");
+
   // Set userToken after component mounts on the client
   useEffect(() => {
     if (typeof document !== "undefined") {
       const token = getAuthToken(document);
+      lastReadAt.current = getReadCookie(document) || "";
       setUserToken(token);
     }
   }, []);
@@ -75,7 +80,6 @@ export default function Dashboard() {
 
         try {
           let { nodes, edges } = await fetchUserGraph(user.remaining_connections > 0 ? 3 : 5, userToken);
-          console.log(nodes)
           if (user.remaining_connections > 0) {
             //Add blank nodes with ? in them
             for (let i = 0; i < user.remaining_connections; i++) {
@@ -200,7 +204,7 @@ export default function Dashboard() {
         </div>) : (<Graph nodes={nodes} edges={edges} setQuery={setSearch} highlightEdges={highlightEdges} obscure={user.remaining_connections > 0} />) }
 
       {user.remaining_connections > 0 && (<ShareDialog num_connections={3-user.remaining_connections} invite_code={user.invite_code}/>)}
-      {edges.length && (<StatusSheet status_updates={nodesWithStatuses.length ? nodesWithStatuses : FAKE_STATUS_UPDATES} last_read_at={new Date(2015, 0, 1)} />)}
+      {edges.length && (<StatusSheet status_updates={nodesWithStatuses.length ? nodesWithStatuses : FAKE_STATUS_UPDATES} last_read_at={lastReadAt?.current || (Date.now()-86400000).toString()} />)}
     </div>
     </ProtectedRoute>
   );
