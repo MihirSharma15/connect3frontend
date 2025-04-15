@@ -16,7 +16,7 @@ export default function StatusCard({ status_update, last_read_at } : { status_up
             {isUnread && (
                 <div className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-white" />
             )}
-            <CardDescription><strong>{status_update.name}</strong> ({ordinalSuffixOf(status_update.degree)}) - {age} ago</CardDescription>
+            <CardDescription><strong>{status_update.name}</strong> ({status_update.degree ? ordinalSuffixOf(status_update.degree) : "You"}) - {age} ago</CardDescription>
             <CardDescription>{status_update.status}</CardDescription>
         </CardContent>
       </Card>
