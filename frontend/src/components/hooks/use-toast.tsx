@@ -1,24 +1,40 @@
-import { toast as hotToast } from "react-hot-toast";
+import { toast as neoToast } from "sonner";
 
-export const toast = (notification: { title: string; description?: string }) => {
-  hotToast(
-    (t) => (
-      <div
-        className="bg-white border border-gray-300 shadow-md rounded-md p-4"
-        style={{ maxWidth: "300px" }}
-      >
-        <h3 className="font-bold text-lg">{notification.title}</h3>
-        {notification.description && (
-          <p className="text-gray-700 text-sm mt-2">{notification.description}</p>
-        )}
-        <button
-          onClick={() => hotToast.dismiss(t.id)}
-          className="text-blue-500 text-sm mt-2"
-        >
-          Dismiss
-        </button>
-      </div>
-    ),
-    { duration: 4000 } // Toast will last for 4 seconds
-  );
+enum ToastType {
+  SUCCESS = "success",
+  ERROR = "error",
+  WARNING = "warning",
+  INFO = "info",
+}
+
+const toast = (notification: { title: string; description?: string; type?: ToastType }) => {
+  switch (notification.type) {
+    case ToastType.SUCCESS:
+      neoToast.success(notification.title, {
+        description: notification.description,
+      });
+      break;
+    case ToastType.ERROR:
+      neoToast.error(notification.title, {
+        description: notification.description,
+      });
+      break;
+    case ToastType.WARNING:
+      neoToast.warning(notification.title, {
+        description: notification.description,
+      });
+      break;
+    case ToastType.INFO:
+      neoToast.info(notification.title, {
+        description: notification.description,
+      });
+      break;
+    default:
+      neoToast(notification.title, {
+        description: notification.description,
+      });
+      break;
+  }
 };
+
+export { toast, ToastType };
