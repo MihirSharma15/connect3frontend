@@ -31,7 +31,7 @@ import { setStatus } from "@/apis/auth";
 export default function StatusSheet({ status_updates, last_read_at, user_status, setUserStatus, setStatusUpdates, unreadState, setUnreadState } : { status_updates: StatusUpdate[], last_read_at: string,  user_status: StatusUpdate, setUserStatus: (status_update: StatusUpdate) => void, setStatusUpdates: (status_updates: StatusUpdate[]) => void, unreadState: boolean, setUnreadState: (state: boolean) => void }) {
     const [statusText, setStatusText] = useState(user_status.status || "");
 
-    const [shareDistance, setShareDistance] = useState(user_status.degree?.toString() || "5");
+    const [shareDistance, setShareDistance] = useState(user_status.status_degree?.toString() || "5");
 
     const setStatusDisabled = !statusText;
     const [removeUnreads, setRemoveUnreads] = useState(false);
@@ -57,6 +57,7 @@ export default function StatusSheet({ status_updates, last_read_at, user_status,
           user_id: user_status.user_id,
           name: user_status.name,
           degree: 0,
+          status_degree: 5,
           status: "",
           status_created_at: new Date(),
           status_expires_at: new Date(),
@@ -74,6 +75,7 @@ export default function StatusSheet({ status_updates, last_read_at, user_status,
           user_id: user_status.user_id,
           name: user_status.name,
           degree: 0,
+          status_degree: parseInt(shareDistance),
           status: statusText,
           status_created_at: new Date(),
           status_expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24),
