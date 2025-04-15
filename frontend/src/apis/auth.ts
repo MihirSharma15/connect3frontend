@@ -3,7 +3,7 @@
 import { getAuthTokenServer } from "@/utils/authUtils.server";
 import { UserInDb } from "@/types/UserInDb";
 
-const API_BASE_URL = "http://0.0.0.0:8080";
+const API_BASE_URL = "https://api.connect3.live";
 
 export async function sendOTP(phonenumber: string) {
   const response = await fetch(`${API_BASE_URL}/auth/send-code`, {
@@ -290,8 +290,8 @@ export async function connectByInviteCode(code: string) {
 }
 
 export async function setStatus(status_content: string, status_degree: number, token: string) {
-  const response = await fetch(`${API_BASE_URL}/users/status`, {
-    method: "PUT",
+  const response = await fetch(`${API_BASE_URL}/status`, {
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${token}`,
@@ -319,5 +319,5 @@ export async function setStatus(status_content: string, status_degree: number, t
       `Error ${response.status} (${response.statusText}): ${detailedErrorMessage}`
     );
   }
-  return await response.json();
+  return;
 }
