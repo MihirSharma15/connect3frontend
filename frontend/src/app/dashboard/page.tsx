@@ -62,11 +62,10 @@ const [unreadState, setUnreadState] = useState(false);
           let foundUserStatus : StatusUpdate | undefined = undefined;
           
           const statusUpdates = nodes.filter(node => node.status?.status_content).map(node => {
-            console.log("checking", node)
             const status = {
               user_id: node.user_id,
               name: node.name,
-              degree: node.status.status_degree,
+              degree: node.degree,
               status: node.status.status_content,
               status_created_at: new Date(node.status.status_created_at),
               status_expires_at: new Date(new Date(node.status.status_created_at).getTime() + 1000 * 60 * 60 * 24)
