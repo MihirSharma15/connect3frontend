@@ -3,7 +3,7 @@
 import { getAuthTokenServer } from "@/utils/authUtils.server";
 import { UserInDb } from "@/types/UserInDb";
 
-const API_BASE_URL = "https://api.connect3.live";
+const API_BASE_URL = "http://0.0.0.0:8080";
 
 export async function sendOTP(phonenumber: string) {
   const response = await fetch(`${API_BASE_URL}/auth/send-code`, {
@@ -264,6 +264,39 @@ export async function connectByInviteCode(code: string) {
       "Authorization": `Bearer ${token}`,
     },
     body: JSON.stringify({ code }),
+  });
+
+  if (!response.ok) {
+    let errorData;
+    try {
+      errorData = await response.json();
+    } catch {
+      errorData = { detail: response.statusText };
+    }
+    let detailedErrorMessage: string;
+    if (Array.isArray(errorData.detail)) {
+      // If detail is an array of errors, join their messages
+      detailedErrorMessage = errorData.detail.map((d: any) => d.msg).join(", ");
+    } else if (typeof errorData.detail === "string") {
+      detailedErrorMessage = errorData.detail;
+    } else {
+      detailedErrorMessage = JSON.stringify(errorData);
+    }
+    console.error(
+      `Error ${response.status} (${response.statusText}): ${detailedErrorMessage}`
+    );
+  }
+  return await response.json();
+}
+
+export async function setStatus(status_content: string, status_degree: number, token: string) {
+  const response = await fetch(`${API_BASE_URL}/users/status`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+    body: JSON.stringify({ status_content, status_degree }),
   });
 
   if (!response.ok) {

@@ -19,26 +19,73 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-import { useRef, useState } from "react";
+import { useState, useEffect } from "react";
 import StatusUpdate from "@/types/StatusUpdate";
 import StatusCard from "./StatusCard";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import humanizer from "@/utils/humanizeDuration"
 import { setReadCookie } from "@/utils/readUtils"
+import { getAuthToken } from "@/utils/authUtils"
 
-export default function StatusSheet({ status_updates, last_read_at, user_status, user_status_degree, user_status_expires_at } : { status_updates: StatusUpdate[], last_read_at: string,  user_status: string | undefined, user_status_degree: number | undefined, user_status_expires_at: Date | undefined }) {
-    const [userStatus, setUserStatus] = useState(user_status || "");
-    const [shareDistance, setShareDistance] = useState(user_status_degree?.toString() || "5");
+export default function StatusSheet({ status_updates, last_read_at, user_status, setUserStatus, setStatusUpdates } : { status_updates: StatusUpdate[], last_read_at: string,  user_status: StatusUpdate, setUserStatus: (status_update: StatusUpdate) => void, setStatusUpdates: (status_updates: StatusUpdate[]) => void }) {
+    const [statusText, setStatusText] = useState(user_status.status || "");
 
-    const setStatusDisabled = !userStatus;
+    const [shareDistance, setShareDistance] = useState(user_status.degree.toString() || "5");
+
+    const setStatusDisabled = !statusText;
     const [removeUnreads, setRemoveUnreads] = useState(false);
 
+    const token = getAuthToken(document);
+    const [isSheetOpen, setIsSheetOpen] = useState(false);
+    const [showInput, setShowInput] = useState(false);
+
+    useEffect(() => {
+      if (isSheetOpen) {
+        const timeout = setTimeout(() => setShowInput(true), 300); // delay to avoid keyboard
+        return () => clearTimeout(timeout);
+      } else {
+        setShowInput(false);
+      }
+    }, [isSheetOpen]);
+
     const handleStatusUpdate = () => {
-      //Handle the request of adding the status to the DB
+      if (!token) return;
+      if (user_status.status) {
+        //Status already exists
+        const newUserStatus : StatusUpdate = {
+          user_id: user_status.user_id,
+          name: user_status.name,
+          degree: 0,
+          status: "",
+          status_created_at: new Date(),
+          status_expires_at: new Date(),
+        };
+        setUserStatus(newUserStatus);
+        status_updates.splice(status_updates.findIndex(s => s.user_id === user_status.user_id), 1);
+        setStatusUpdates(status_updates);
+        setStatusText("");
+      } else {
+        //Handle the request of adding the status to the DB
+        //setStatus(userStatus, parseInt(shareDistance), token);
+
+        const newUserStatus : StatusUpdate = {
+          user_id: user_status.user_id,
+          name: user_status.name,
+          degree: 0,
+          status: statusText,
+          status_created_at: new Date(),
+          status_expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24),
+        };
+        setUserStatus(newUserStatus);
+        status_updates.unshift(newUserStatus);
+        setStatusUpdates(status_updates);
+      }
       //Then update the status_updates to show the new status
+      
     };
 
     const updateLastRead = (open: boolean) => {
+      setIsSheetOpen(open);
       if (open && document) setReadCookie(document);
       if (!open) setRemoveUnreads(true);
     }
@@ -51,7 +98,7 @@ export default function StatusSheet({ status_updates, last_read_at, user_status,
     </div>
   </SheetTrigger>
   </div>
-  <SheetContent className="bg-white text-black pl-5 pr-5 flex flex-col h-full" side="right">
+  <SheetContent className="bg-white text-black pl-5 pr-5 flex flex-col h-full w-[90vw] sm:w-[400px]" side="right">
     <SheetHeader className="pl-0" >
       <SheetTitle>Your Network</SheetTitle>
     </SheetHeader>
@@ -65,13 +112,15 @@ export default function StatusSheet({ status_updates, last_read_at, user_status,
     
     <SheetFooter className="pt-0">
     <hr />
-    <Label htmlFor="sheet-status-input">{user_status ? "" : "Set "}Your Status <span className="text-xs">(disappears {user_status_expires_at ? `in ${humanizer.humanize(user_status_expires_at.getTime() - Date.now(), { language: "shortEn", units: ["h", "m", "s"], round: true, largest: 1, spacer: "" })}` : "after 24h"})</span></Label>
-        <Input id="sheet-status-input" defaultValue={userStatus} placeholder="Your Status" disabled={!!user_status} onChange={(e) => setUserStatus(e.target.value)} />
+    <Label htmlFor="sheet-status-input">{user_status.status ? "" : "Set "}Your Status <span className="text-xs">(disappears {user_status.status && user_status.status_expires_at ? `in ${humanizer.humanize(user_status.status_expires_at.getTime() - Date.now(), { language: "shortEn", units: ["h", "m", "s"], round: true, largest: 1, spacer: "" })}` : "after 24h"})</span></Label>
+    {showInput && (<Input className="text-base" id="sheet-status-input" value={statusText} placeholder="Your Status" disabled={!!user_status.status} onChange={(e) => setStatusText(e.target.value)} onFocus={(e) => {
+    // If needed, do something on focus
+  }} />)}
         <div className="flex flex-row gap-2">
-        <Button className="flex-1" disabled={setStatusDisabled} type="submit">{user_status ? "Clear" : "Share"} status</Button>
+        <Button className="flex-1" disabled={setStatusDisabled} type="submit" onClick={handleStatusUpdate}>{user_status.status ? "Clear" : "Share"} status</Button>
         <Select
             value={shareDistance}
-            disabled={!!user_status}
+            disabled={!!user_status.status}
             onValueChange={(value) => {
                 setShareDistance(value);
             }}

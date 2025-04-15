@@ -15,7 +15,7 @@ import { get } from "http";
 
 const FAKE_STATUS_UPDATES : StatusUpdate[] = [
   {
-    user_id: "725edcba-973a-448b-a3c8-ea2ecfa537f4",
+    user_id: "725edcba-973a-448b-a3c8-ea2efcfa537f4",
     name: "Lucas Moore",
     degree: 3,
     status: "Taking a quick break—back soon!",
@@ -23,7 +23,7 @@ const FAKE_STATUS_UPDATES : StatusUpdate[] = [
     status_expires_at: new Date(Date.now() + 1000 * 60 * 15), // 15 minutes from now
   },
   {
-    user_id: "725edcba-973a-448b-a3c8-ea2ecfa537f4",
+    user_id: "725edcba-973a-448b-a3c8-ea2ecffa537f4",
     name: "Riley Tran",
     degree: 5,
     status: "Wrapping up some emails—ping me if urgent.",
@@ -31,7 +31,7 @@ const FAKE_STATUS_UPDATES : StatusUpdate[] = [
     status_expires_at: new Date(Date.now() + 1000 * 60 * 30), // 30 minutes from now
   },
   {
-    user_id: "725edcba-973a-448b-a3c8-ea2ecfa537f4",
+    user_id: "725edcba-973a-448b-a3c8-ea2efcfa537f4",
     name: "Avery Chen",
     degree: 2,
     status: "On a call—will check messages after.",
@@ -39,7 +39,7 @@ const FAKE_STATUS_UPDATES : StatusUpdate[] = [
     status_expires_at: new Date(Date.now() + 1000 * 60 * 40), // 40 minutes from now
   },
   {
-    user_id: "725edcba-973a-448b-a3c8-ea2ecfa537f4",
+    user_id: "725edcba-973a-448b-a3c8-ea2fecfa537f4",
     name: "Jordan Ellis",
     degree: 4,
     status: "Heads down finishing up the report 📄",
@@ -58,6 +58,8 @@ export default function Dashboard() {
   const [nodes, setNodes]  = useState<{ name: string, id: string }[]>([]); // Nodes in the graph
   const [edges, setEdges]  = useState<{ source: string, target: string }[]>([]); // Edges in the graph
   const [userToken, setUserToken] = useState<string | undefined>(undefined); // Auth token
+  const [statusUpdates, setStatusUpdates] = useState<StatusUpdate[]>([]); // Status updates
+  const [userStatus, setUserStatus] = useState<StatusUpdate | undefined>(); // User status
 
   const lastReadAt = React.useRef("");
 
@@ -79,7 +81,7 @@ export default function Dashboard() {
         setUser(user);
 
         try {
-          let { nodes, edges } = await fetchUserGraph(user.remaining_connections > 0 ? 3 : 5, userToken);
+          let { nodes, edges } = await fetchUserGraph(user.remaining_connections > 0 ? 3 : 7, userToken);
           if (user.remaining_connections > 0) {
             //Add blank nodes with ? in them
             for (let i = 0; i < user.remaining_connections; i++) {
@@ -89,6 +91,30 @@ export default function Dashboard() {
           }
           setNodes(nodes.map(n => ({ name: n.name, id: n.user_id, degree: n.user_id === user.user_id ? 0 : n.degree })));
           setEdges(edges);
+
+          let foundUserStatus : StatusUpdate | undefined = undefined;
+          const statusUpdates = nodes.filter(node => node.status).map(node => {
+            const status = {
+              user_id: node.user_id,
+              name: node.name,
+              degree: node.status_degree,
+              status: node.status,
+              status_created_at: node.status_created_at,
+              status_expires_at: node.status_expires_at
+            };
+            if (node.user_id === user.user_id) foundUserStatus = status;
+            return status;
+          });
+          setStatusUpdates(statusUpdates);
+          if (!foundUserStatus) foundUserStatus = {
+            user_id: user.user_id,
+            name: user.name,
+            degree: 5,
+            status: "",
+            status_created_at: new Date(),
+            status_expires_at: new Date()
+          };
+          setUserStatus(foundUserStatus);
         } catch (error) {
           console.error("Error fetching graph:", error);
         }
@@ -163,8 +189,6 @@ export default function Dashboard() {
     setResults([]); // Clear the dropdown after selection
   };
 
-  const nodesWithStatuses = nodes.filter(node => node.status);
-
   return (
     <ProtectedRoute>
     <div className="relative w-screen h-screen">
@@ -204,7 +228,7 @@ export default function Dashboard() {
         </div>) : (<Graph nodes={nodes} edges={edges} setQuery={setSearch} highlightEdges={highlightEdges} obscure={user.remaining_connections > 0} />) }
 
       {user.remaining_connections > 0 && (<ShareDialog num_connections={3-user.remaining_connections} invite_code={user.invite_code}/>)}
-      {edges.length && (<StatusSheet status_updates={nodesWithStatuses.length ? nodesWithStatuses : FAKE_STATUS_UPDATES} last_read_at={lastReadAt?.current || (Date.now()-86400000).toString()} />)}
+      {edges.length && userStatus && (<StatusSheet status_updates={statusUpdates.length ? statusUpdates : FAKE_STATUS_UPDATES} last_read_at={lastReadAt?.current || (Date.now()-86400000).toString()} user_status={userStatus} setStatusUpdates={setStatusUpdates} setUserStatus={setUserStatus} />)}
     </div>
     </ProtectedRoute>
   );
