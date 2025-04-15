@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { toast } from "@/components/hooks/use-toast";
+import { toast, ToastType } from "@/components/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
@@ -95,23 +95,23 @@ export default function Signup() {
   const sendOTPMutation = useMutation({
     mutationFn: sendOTP,
     onSuccess: () => {
-      toast({ title: "OTP Sent", description: "Check your phone for the OTP." });
+      toast({ title: "OTP Sent", description: "Check your phone for the OTP.", type: ToastType.INFO });
       setStep(2);
     },
-    onError: (error: any) => {
-      toast({ title: "Error", description: error.message });
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, type: ToastType.ERROR });
     },
   });
 
   const verifyOTPMutation = useMutation({
     mutationFn: verifyCode,
     onSuccess: (result) => {
-      toast({ title: "OTP Verified" });
+      toast({ title: "OTP Verified", type: ToastType.SUCCESS });
       setAccessToken(result.phone_verification_token.access_token);
       setStep(3);
     },
     onError: (error: any) => {
-      toast({ title: "Error", description: error.message });
+      toast({ title: "Error", description: error.message, type: ToastType.ERROR });
     },
   });
 
@@ -119,18 +119,18 @@ export default function Signup() {
     mutationFn: (data: { name: string; password: string; phonenumber: string }) =>
       registerUser(data, accessToken),
     onSuccess: () => {
-      toast({ title: "Account Created", description: "Welcome to CONNECT3!" });
+      toast({ title: "Account Created", description: "Welcome to CONNECT3!", type: ToastType.SUCCESS });
       loginMutation.mutate({ phonenumber, password: detailsForm.getValues("password") });
     },
-    onError: (error: any) => {
-      toast({ title: "Error", description: error.message });
+    onError: (error: Error) => {
+      toast({ title: "Error", description: error.message, type: ToastType.ERROR });
     },
   });
 
   const loginMutation = useMutation({
     mutationFn: loginUser,
     onSuccess: (result) => {
-      toast({ title: "User Verified" });
+      toast({ title: "Logged In", type: ToastType.SUCCESS });
       setAuthCookie(result.access_token); 
       if (inviteCode) {
         connectMutation.mutate(inviteCode);
@@ -138,7 +138,7 @@ export default function Signup() {
       router.push("/dashboard");
     },
     onError: (error: any) => {
-      toast({ title: "Login Failed", description: error.message });
+      toast({ title: "Login Failed", description: error.message, type: ToastType.ERROR });
     },
   });
 
@@ -146,11 +146,10 @@ export default function Signup() {
     const connectMutation = useMutation({
       mutationFn: (code: string) => connectByInviteCode(code),
       onSuccess: (data) => {
-        toast({ title: "Connection Created", description: "Your connection has been created successfully." });
+        toast({ title: "Connection Created", description: "Your connection has been created successfully.", type: ToastType.SUCCESS });
       },
       onError: (error: any) => {
-        // Display the error. This error text is the same as shown in your invite page.
-        toast({ title: "Error", description: error.message || "Invite Code Expired or Not Valid." });
+        toast({ title: "Error", description: error.message || "Invite Code Expired or Invalid.", type: ToastType.ERROR });
       },
     });
 

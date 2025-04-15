@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { toast } from "@/components/hooks/use-toast";
+import { toast, ToastType } from "@/components/hooks/use-toast";
 import React, { useState, useEffect } from "react";
 import {
   Form,
@@ -68,7 +68,7 @@ useEffect(() => {
   if (inviteCode && !inviteConnected) {
     connectByInviteCode(inviteCode)
       .then(() => {
-        toast({ title: "Connected via Invite" });
+        toast({ title: "Connected via Invite", type: ToastType.SUCCESS });
         setInviteConnected(true);
       })
       .catch((error) => {
@@ -81,12 +81,12 @@ useEffect(() => {
   const loginUserMutation = useMutation({
       mutationFn: loginUser,
       onSuccess: (result) => {
-        toast({ title: "User Verified" });
+        toast({ title: "Logged In", type: ToastType.SUCCESS });
         setAuthCookie(result.access_token);
         router.push("/dashboard");
       },
-      onError: (error: any) => {
-        toast({ title: "Error", description: error.message });
+      onError: (error: Error) => {
+        toast({ title: "Error", description: error.message, type: ToastType.ERROR });
       },
   });
 
