@@ -1,30 +1,30 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import React from 'react';
 import { Button } from "@/components/ui/button";
-import ShareButton from "./ShareButton";
-import { useState } from "react";
 
-export default function ShareDialog({ num_connections, invite_code } : { num_connections: number, invite_code: string }) {
-    const [open, setOpen] = useState(true);
+function ShareButton({ title, text, url }: { title: string, text: string, url: string }) {
+    const handleShare = async () => {
+      if (navigator.share) {
+        try {
+          await navigator.share({ title, text, url });
+        } catch (err) {
+          console.error("Sharing failed:", err);
+        }
+      } else {
+        try {
+          if (navigator.clipboard) await navigator.clipboard.writeText(url);
+          alert("Invite link copied to clipboard! Send it to 3 of your friends");
+        } catch (err) {
+          alert("Sharing not supported on this device.");
+          console.error("Clipboard write failed:", err);
+        }
+      }
+    };
+  
+    return (
+      <Button onClick={handleShare}>
+        Share
+      </Button>
+    );
+  }
 
-    return (<Dialog open={open} onOpenChange={setOpen}>
-        <div className="fixed bottom-4 right-4 z-50">
-        <DialogTrigger asChild>
-            <Button>Invite Friends</Button>
-            </DialogTrigger></div>
-          <DialogContent className="bg-white text-black"
-          >
-            <DialogHeader>
-                <DialogTitle>Unlock Your Network</DialogTitle>
-              <DialogDescription>
-                You must have 3 connections to unlock the full graph. Share your invite with your friends, and once they join you'll be able to see your network!
-                <br /><br />
-                You have invited <strong>{num_connections}/3</strong> connections.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <ShareButton title="Join me on Connect3: UNC's First Social Graph!" text="" url={`https://connect3.live/invite/${invite_code}`} />
-            </DialogFooter>
-          </DialogContent>
-          </Dialog>
-      );
-}
+export default ShareButton;

@@ -13,41 +13,6 @@ import StatusUpdate from "@/types/StatusUpdate";
 import { getReadCookie } from "@/utils/readUtils";
 import { get } from "http";
 
-const FAKE_STATUS_UPDATES : StatusUpdate[] = [
-  {
-    user_id: "725edcba-973a-448b-a3c8-ea2efcfa537f4",
-    name: "Lucas Moore",
-    degree: 3,
-    status: "Taking a quick break—back soon!",
-    status_created_at: new Date(), // 45 minutes ago
-    status_expires_at: new Date(Date.now() + 1000 * 60 * 15), // 15 minutes from now
-  },
-  {
-    user_id: "725edcba-973a-448b-a3c8-ea2ecffa537f4",
-    name: "Riley Tran",
-    degree: 5,
-    status: "Wrapping up some emails—ping me if urgent.",
-    status_created_at: new Date(Date.now() - 1000 * 60 * 90), // 1.5 hours ago
-    status_expires_at: new Date(Date.now() + 1000 * 60 * 30), // 30 minutes from now
-  },
-  {
-    user_id: "725edcba-973a-448b-a3c8-ea2efcfa537f4",
-    name: "Avery Chen",
-    degree: 2,
-    status: "On a call—will check messages after.",
-    status_created_at: new Date(Date.now() - 1000 * 60 * 20), // 20 minutes ago
-    status_expires_at: new Date(Date.now() + 1000 * 60 * 40), // 40 minutes from now
-  },
-  {
-    user_id: "725edcba-973a-448b-a3c8-ea2fecfa537f4",
-    name: "Jordan Ellis",
-    degree: 4,
-    status: "Heads down finishing up the report 📄",
-    status_created_at: new Date(Date.now() - 1000 * 60 * 120), // 2 hours ago
-    status_expires_at: new Date(Date.now() + 1000 * 60 * 10), // 10 minutes from now
-  },
-];
-
 export default function Dashboard() {
   const [search, setSearch] = useState(""); // User's search query
   const [highlightEdges, setHighlightEdges] = useState([]); // Highlighted edges based on query
@@ -58,9 +23,10 @@ export default function Dashboard() {
   const [nodes, setNodes]  = useState<{ name: string, id: string }[]>([]); // Nodes in the graph
   const [edges, setEdges]  = useState<{ source: string, target: string }[]>([]); // Edges in the graph
   const [userToken, setUserToken] = useState<string | undefined>(undefined); // Auth token
-  const [statusUpdates, setStatusUpdates] = useState<StatusUpdate[]>([]); // Status updates
-  const [userStatus, setUserStatus] = useState<StatusUpdate | undefined>(); // User status
-  const [unreadState, setUnreadState] = useState(false); // User status
+  const [statusUpdates, setStatusUpdates] = useState<StatusUpdate[]>([]);
+  const [userStatus, setUserStatus] = useState<StatusUpdate | undefined>();
+
+const [unreadState, setUnreadState] = useState(false);
 
   const lastReadAt = React.useRef("");
 
@@ -86,7 +52,7 @@ export default function Dashboard() {
           if (user.remaining_connections > 0) {
             //Add blank nodes with ? in them
             for (let i = 0; i < user.remaining_connections; i++) {
-              nodes.push({ name: "?", user_id: `blank${i}` });
+              nodes.push({ name: "?", user_id: `blank${i}`, status: { } });
               edges.push({ source: `blank${i}`, target: user.user_id });
             }
           }
@@ -94,7 +60,9 @@ export default function Dashboard() {
           setEdges(edges);
 
           let foundUserStatus : StatusUpdate | undefined = undefined;
-          const statusUpdates = nodes.filter(node => node.status && node.status.status_content).map(node => {
+          
+          const statusUpdates = nodes.filter(node => node.status?.status_content).map(node => {
+            console.log("checking", node)
             const status = {
               user_id: node.user_id,
               name: node.name,
@@ -107,7 +75,7 @@ export default function Dashboard() {
             if (node.user_id === user.user_id && node.status.status_content) foundUserStatus = status;
             return status;
           });
-          console.log("midway", statusUpdates)
+          
           setStatusUpdates(statusUpdates);
           if (!foundUserStatus) foundUserStatus = {
             user_id: user.user_id,
@@ -117,7 +85,7 @@ export default function Dashboard() {
             status_created_at: new Date(),
             status_expires_at: new Date()
           };
-          setUserStatus(foundUserStatus);
+          if (!(userStatus?.status === "" && foundUserStatus.status === "")) setUserStatus(foundUserStatus);
         } catch (error) {
           console.error("Error fetching graph:", error);
         }
@@ -127,7 +95,7 @@ export default function Dashboard() {
     };
 
     fetchCurrentUser();
-  }, [userToken]);
+  }, [userToken, unreadState]);
 
   // Fetch users for search
   const fetchUsers = async (query: string) => {
@@ -231,7 +199,7 @@ export default function Dashboard() {
         </div>) : (<Graph nodes={nodes} edges={edges} setQuery={setSearch} highlightEdges={highlightEdges} obscure={user.remaining_connections > 0} />) }
         {console.log(statusUpdates)}
       {user.remaining_connections > 0 && (<ShareDialog num_connections={3-user.remaining_connections} invite_code={user.invite_code}/>)}
-      {edges.length && userStatus && (<StatusSheet status_updates={statusUpdates.length ? statusUpdates : FAKE_STATUS_UPDATES} last_read_at={lastReadAt?.current || (Date.now()-86400000).toString()} user_status={userStatus} setStatusUpdates={setStatusUpdates} setUserStatus={setUserStatus} unreadState={unreadState} setUnreadState={setUnreadState} />)}
+      {user.remaining_connections === 0 && edges.length && userStatus && (<StatusSheet status_updates={statusUpdates.length ? statusUpdates : []} last_read_at={lastReadAt?.current || (Date.now()-86400000).toString()} user_status={userStatus} setStatusUpdates={setStatusUpdates} setUserStatus={setUserStatus} unreadState={unreadState} setUnreadState={setUnreadState} />)}
     </div>
     </ProtectedRoute>
   );
