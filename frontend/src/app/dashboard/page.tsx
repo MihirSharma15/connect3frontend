@@ -67,6 +67,7 @@ const [unreadState, setUnreadState] = useState(false);
               name: node.name,
               degree: node.degree,
               status: node.status.status_content,
+              status_degree: node.status.status_degree,
               status_created_at: new Date(node.status.status_created_at),
               status_expires_at: new Date(new Date(node.status.status_created_at).getTime() + 1000 * 60 * 60 * 24)
             };
@@ -81,6 +82,7 @@ const [unreadState, setUnreadState] = useState(false);
             name: user.name,
             degree: 5,
             status: "",
+            status_degree: 5,
             status_created_at: new Date(),
             status_expires_at: new Date()
           };
