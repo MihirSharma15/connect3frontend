@@ -60,6 +60,7 @@ export default function Dashboard() {
   const [userToken, setUserToken] = useState<string | undefined>(undefined); // Auth token
   const [statusUpdates, setStatusUpdates] = useState<StatusUpdate[]>([]); // Status updates
   const [userStatus, setUserStatus] = useState<StatusUpdate | undefined>(); // User status
+  const [unreadState, setUnreadState] = useState(false); // User status
 
   const lastReadAt = React.useRef("");
 
@@ -93,18 +94,20 @@ export default function Dashboard() {
           setEdges(edges);
 
           let foundUserStatus : StatusUpdate | undefined = undefined;
-          const statusUpdates = nodes.filter(node => node.status).map(node => {
+          const statusUpdates = nodes.filter(node => node.status && node.status.status_content).map(node => {
             const status = {
               user_id: node.user_id,
               name: node.name,
-              degree: node.status_degree,
-              status: node.status,
-              status_created_at: node.status_created_at,
-              status_expires_at: node.status_expires_at
+              degree: node.status.status_degree,
+              status: node.status.status_content,
+              status_created_at: new Date(node.status.status_created_at),
+              status_expires_at: new Date(new Date(node.status.status_created_at).getTime() + 1000 * 60 * 60 * 24)
             };
-            if (node.user_id === user.user_id) foundUserStatus = status;
+            if (!unreadState && status.status_created_at?.getTime() > parseInt(lastReadAt.current || "0")) setUnreadState(true);
+            if (node.user_id === user.user_id && node.status.status_content) foundUserStatus = status;
             return status;
           });
+          console.log("midway", statusUpdates)
           setStatusUpdates(statusUpdates);
           if (!foundUserStatus) foundUserStatus = {
             user_id: user.user_id,
@@ -226,9 +229,9 @@ export default function Dashboard() {
       {!edges.length ? (<div className="flex items-center justify-center h-screen">
           <Spinner>Loading your social network.</Spinner>
         </div>) : (<Graph nodes={nodes} edges={edges} setQuery={setSearch} highlightEdges={highlightEdges} obscure={user.remaining_connections > 0} />) }
-
+        {console.log(statusUpdates)}
       {user.remaining_connections > 0 && (<ShareDialog num_connections={3-user.remaining_connections} invite_code={user.invite_code}/>)}
-      {edges.length && userStatus && (<StatusSheet status_updates={statusUpdates.length ? statusUpdates : FAKE_STATUS_UPDATES} last_read_at={lastReadAt?.current || (Date.now()-86400000).toString()} user_status={userStatus} setStatusUpdates={setStatusUpdates} setUserStatus={setUserStatus} />)}
+      {edges.length && userStatus && (<StatusSheet status_updates={statusUpdates.length ? statusUpdates : FAKE_STATUS_UPDATES} last_read_at={lastReadAt?.current || (Date.now()-86400000).toString()} user_status={userStatus} setStatusUpdates={setStatusUpdates} setUserStatus={setUserStatus} unreadState={unreadState} setUnreadState={setUnreadState} />)}
     </div>
     </ProtectedRoute>
   );

@@ -26,11 +26,12 @@ import { ScrollArea } from "@radix-ui/react-scroll-area";
 import humanizer from "@/utils/humanizeDuration"
 import { setReadCookie } from "@/utils/readUtils"
 import { getAuthToken } from "@/utils/authUtils"
+import { setStatus } from "@/apis/auth";
 
-export default function StatusSheet({ status_updates, last_read_at, user_status, setUserStatus, setStatusUpdates } : { status_updates: StatusUpdate[], last_read_at: string,  user_status: StatusUpdate, setUserStatus: (status_update: StatusUpdate) => void, setStatusUpdates: (status_updates: StatusUpdate[]) => void }) {
+export default function StatusSheet({ status_updates, last_read_at, user_status, setUserStatus, setStatusUpdates, unreadState, setUnreadState } : { status_updates: StatusUpdate[], last_read_at: string,  user_status: StatusUpdate, setUserStatus: (status_update: StatusUpdate) => void, setStatusUpdates: (status_updates: StatusUpdate[]) => void, unreadState: boolean, setUnreadState: (state: boolean) => void }) {
     const [statusText, setStatusText] = useState(user_status.status || "");
 
-    const [shareDistance, setShareDistance] = useState(user_status.degree.toString() || "5");
+    const [shareDistance, setShareDistance] = useState(user_status.degree?.toString() || "5");
 
     const setStatusDisabled = !statusText;
     const [removeUnreads, setRemoveUnreads] = useState(false);
@@ -61,12 +62,13 @@ export default function StatusSheet({ status_updates, last_read_at, user_status,
           status_expires_at: new Date(),
         };
         setUserStatus(newUserStatus);
+        setStatus("", 5, token);
         status_updates.splice(status_updates.findIndex(s => s.user_id === user_status.user_id), 1);
         setStatusUpdates(status_updates);
         setStatusText("");
       } else {
         //Handle the request of adding the status to the DB
-        //setStatus(userStatus, parseInt(shareDistance), token);
+        setStatus(statusText, parseInt(shareDistance), token);
 
         const newUserStatus : StatusUpdate = {
           user_id: user_status.user_id,
@@ -87,14 +89,17 @@ export default function StatusSheet({ status_updates, last_read_at, user_status,
     const updateLastRead = (open: boolean) => {
       setIsSheetOpen(open);
       if (open && document) setReadCookie(document);
-      if (!open) setRemoveUnreads(true);
+      if (!open) {
+        setUnreadState(false); // Whether to display unread on For You button
+        setRemoveUnreads(true); // Whether to force remove unreads from post list
+      }
     }
 
     return (<Sheet onOpenChange={updateLastRead}>
         <div className="fixed bottom-4 right-4 z-50">
   <SheetTrigger asChild>
     <div>
-    <Button>For You {(<div className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-white animate-pulse" />)}</Button>
+    <Button>For You {unreadState && (<div className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-white animate-pulse" />)}</Button>
     </div>
   </SheetTrigger>
   </div>
@@ -102,8 +107,8 @@ export default function StatusSheet({ status_updates, last_read_at, user_status,
     <SheetHeader className="pl-0" >
       <SheetTitle>Your Network</SheetTitle>
     </SheetHeader>
-    <ScrollArea className="flex-1 overflow-auto">
-    {status_updates.map((status_update, index) => (
+    <ScrollArea className="flex-1 overflow-auto pt-1">
+    {status_updates.sort((a, b) => b.status_created_at.getTime() - a.status_created_at.getTime()).map((status_update, index) => (
       <div key={index} className="mb-4">
         <StatusCard status_update={status_update} last_read_at={removeUnreads ? Date.now().toString()+100 : last_read_at} />
       </div>
@@ -113,7 +118,7 @@ export default function StatusSheet({ status_updates, last_read_at, user_status,
     <SheetFooter className="pt-0">
     <hr />
     <Label htmlFor="sheet-status-input">{user_status.status ? "" : "Set "}Your Status <span className="text-xs">(disappears {user_status.status && user_status.status_expires_at ? `in ${humanizer.humanize(user_status.status_expires_at.getTime() - Date.now(), { language: "shortEn", units: ["h", "m", "s"], round: true, largest: 1, spacer: "" })}` : "after 24h"})</span></Label>
-    {showInput && (<Input className="text-base" id="sheet-status-input" value={statusText} placeholder="Your Status" disabled={!!user_status.status} onChange={(e) => setStatusText(e.target.value)} onFocus={(e) => {
+    {showInput && (<Input className="text-base" id="sheet-status-input" maxLength={500} value={statusText} placeholder="Your Status" disabled={!!user_status.status} onChange={(e) => setStatusText(e.target.value)} onFocus={(e) => {
     // If needed, do something on focus
   }} />)}
         <div className="flex flex-row gap-2">
