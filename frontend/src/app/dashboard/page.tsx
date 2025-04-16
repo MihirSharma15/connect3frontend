@@ -11,7 +11,6 @@ import { Spinner } from "@/components/ui/spinner";
 import StatusSheet from "./components/StatusSheet";
 import StatusUpdate from "@/types/StatusUpdate";
 import { getReadCookie } from "@/utils/readUtils";
-import { get } from "http";
 
 export default function Dashboard() {
   const [search, setSearch] = useState(""); // User's search query
@@ -68,8 +67,8 @@ const [unreadState, setUnreadState] = useState(false);
               degree: node.degree,
               status: node.status.status_content,
               status_degree: node.status.status_degree,
-              status_created_at: new Date(node.status.status_created_at),
-              status_expires_at: new Date(new Date(node.status.status_created_at).getTime() + 1000 * 60 * 60 * 24)
+              status_created_at: new Date(`${node.status.status_created_at}Z`),
+              status_expires_at: new Date(new Date(`${node.status.status_created_at}Z`).getTime() + 1000 * 60 * 60 * 24)
             };
             if (!unreadState && status.status_created_at?.getTime() > parseInt(lastReadAt.current || "0")) setUnreadState(true);
             if (node.user_id === user.user_id && node.status.status_content) foundUserStatus = status;
@@ -198,7 +197,6 @@ const [unreadState, setUnreadState] = useState(false);
       {!edges.length ? (<div className="flex items-center justify-center h-screen">
           <Spinner>Loading your social network.</Spinner>
         </div>) : (<Graph nodes={nodes} edges={edges} setQuery={setSearch} highlightEdges={highlightEdges} obscure={user.remaining_connections > 0} />) }
-        {console.log(statusUpdates)}
       {user.remaining_connections > 0 && (<ShareDialog num_connections={3-user.remaining_connections} invite_code={user.invite_code}/>)}
       {user.remaining_connections === 0 && edges.length && userStatus && (<StatusSheet status_updates={statusUpdates.length ? statusUpdates : []} last_read_at={lastReadAt?.current || (Date.now()-86400000).toString()} user_status={userStatus} setStatusUpdates={setStatusUpdates} setUserStatus={setUserStatus} unreadState={unreadState} setUnreadState={setUnreadState} />)}
     </div>
