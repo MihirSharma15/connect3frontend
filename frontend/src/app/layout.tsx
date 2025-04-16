@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Connect3",
-  description: "A social project by Mihir & Pranav",
+  description: "A social venture.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
