@@ -86,7 +86,7 @@ useEffect(() => {
         router.push("/dashboard");
       },
       onError: (error: Error) => {
-        toast({ title: "Error", description: error.message, type: ToastType.ERROR });
+        toast({ title: "Error", description: error.message.startsWith("An error occurred in the Server") ? "Incorrect username or password" : error.message, type: ToastType.ERROR });
       },
   });
 
