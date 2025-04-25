@@ -67,6 +67,7 @@ export async function registerUser(
 }
 
 export async function loginUser(data: { phonenumber: string; password: string }) {
+
   const formData = new URLSearchParams({
     username: data.phonenumber,
     password: data.password,
@@ -80,7 +81,6 @@ export async function loginUser(data: { phonenumber: string; password: string })
 
   if (!response.ok) {
     const errorBody = await response.json();
-    console.error("Error response body:", errorBody);
 
     let errorMessage;
     if (errorBody.detail && Array.isArray(errorBody.detail)) {

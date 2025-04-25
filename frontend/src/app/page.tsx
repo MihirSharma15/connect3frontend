@@ -44,7 +44,10 @@ export default function Home() {
             </h1>
             <div className="flex flex-col space-y-4 w-full max-w-md">
               <div className="flex flex-row space-x-5">
-                <Button asChild className="bg-customBlue z-0 flex-1">
+                <Button className="bg-customBlue z-0 flex-1">
+                  Coming Soon.
+                </Button>
+                {/* <Button asChild className="bg-customBlue z-0 flex-1">
                   <Link href="/signup">
                     Get Started
                     <ArrowUpRightIcon />
@@ -52,7 +55,7 @@ export default function Home() {
                 </Button>
                 <Button asChild variant={"neutral"} className="bg-white z-0 flex-1">
                   <Link href="/login">Log in.</Link>
-                </Button>
+                </Button> */}
               </div>
               <LandingPageSheet />
             </div>
